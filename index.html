@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shanmuga Industries Arts and Science College — Fees Management</title>
+  <link rel="stylesheet" href="public/css/style.css" />
+</head>
+<body>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h2>🎓 Shanmuga Industries</h2>
+    <span>Arts and Science College</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <button class="nav-link active" data-page="dashboard">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+
+    <div class="nav-section">Academic</div>
+    <button class="nav-link" data-page="students">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Students
+    </button>
+    <button class="nav-link" data-page="fees">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Fee Structure
+    </button>
+
+    <div class="nav-section">Finance</div>
+    <button class="nav-link" data-page="payments">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Payments
+    </button>
+    <button class="nav-link" data-page="reports">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    &copy; 2024 Shanmuga Industries Arts and Science College
+  </div>
+</aside>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<div class="main-wrapper">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="flex items-center gap-3">
+      <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:.85rem;font-weight:600;color:var(--text-muted);margin-right:4px">Manigandan</span>
+      <div class="avatar" title="Manigandan">MG</div>
+      <button class="btn btn-outline btn-sm" onclick="logout()" style="margin-left:8px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Pages -->
+  <main class="page-content">
+
+    <!-- ══════ DASHBOARD PAGE ══════ -->
+    <section class="page" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Overview of college fee collection and student statistics</p>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">👥</div>
+          <div class="stat-info">
+            <h3 id="stat-total-students">0</h3>
+            <p>Total Students</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div class="stat-info">
+            <h3 id="stat-active-students">0</h3>
+            <p>Active Students</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon teal">💰</div>
+          <div class="stat-info">
+            <h3 id="stat-fees-collected">₹0</h3>
+            <p>Fees Collected</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">⏳</div>
+          <div class="stat-info">
+            <h3 id="stat-fees-pending">₹0</h3>
+            <p>Fees Pending</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">✔️</div>
+          <div class="stat-info">
+            <h3 id="stat-paid-count">0</h3>
+            <p>Fully Paid</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">❌</div>
+          <div class="stat-info">
+            <h3 id="stat-pending-count">0</h3>
+            <p>Pending Payments</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="grid-2">
+        <!-- Collection progress -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Collection Progress</h2>
+            <span class="fw-bold" style="font-size:1.1rem;color:var(--primary)" id="collection-pct">0%</span>
+          </div>
+          <div class="progress" style="height:14px;margin-bottom:10px">
+            <div class="progress-bar" id="collection-bar" style="width:0%"></div>
+          </div>
+          <p class="text-muted" style="font-size:.82rem" id="collection-label"></p>
+
+          <hr style="margin:20px 0;border:none;border-top:1px solid var(--border)">
+          <h3 style="font-size:.9rem;margin-bottom:14px">Payment Status</h3>
+          <div class="donut-wrap">
+            <div id="donut-chart"></div>
+            <div id="donut-legend" class="donut-legend"></div>
+          </div>
+        </div>
+
+        <!-- Monthly bar chart -->
+        <div class="card">
+          <div class="card-header"><h2>Monthly Collection</h2></div>
+          <div class="chart-container" id="bar-chart"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Recent Payments -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Payments</h2>
+            <button class="btn btn-outline btn-sm" onclick="navigate('payments')">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Receipt</th><th>Student</th><th>Amount</th><th>Date</th><th>Status</th>
+              </tr></thead>
+              <tbody id="recent-payments-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Students per course -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Students by Course</h2>
+            <button class="btn btn-outline btn-sm" onclick="navigate('students')">View All</button>
+          </div>
+          <div id="course-student-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ STUDENTS PAGE ══════ -->
+    <section class="page" id="page-students">
+      <div class="page-header">
+        <div>
+          <h1>Students</h1>
+          <p>Manage student records and view fee status</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddStudent()">+ Add Student</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>All Students</h2>
+          <div class="search-bar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="student-search" placeholder="Search by name, roll no, email…" />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Student</th><th>Course</th><th>Contact</th><th>Admission</th><th>Fee Status</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="students-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ FEE STRUCTURE PAGE ══════ -->
+    <section class="page" id="page-fees">
+      <div class="page-header">
+        <div>
+          <h1>Fee Structure</h1>
+          <p>Define course fee structures by year</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddCourse()">+ Add Course</button>
+      </div>
+      <div id="courses-list" style="display:flex;flex-direction:column;gap:20px"></div>
+    </section>
+
+    <!-- ══════ PAYMENTS PAGE ══════ -->
+    <section class="page" id="page-payments">
+      <div class="page-header">
+        <div>
+          <h1>Payments</h1>
+          <p>Record and manage student fee payments</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddPayment()">+ Record Payment</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Payment Records</h2>
+          <div class="flex gap-2 flex-wrap">
+            <button class="btn btn-primary btn-sm pay-filter-btn" data-status="all">All</button>
+            <button class="btn btn-outline btn-sm pay-filter-btn" data-status="Paid">Paid</button>
+            <button class="btn btn-outline btn-sm pay-filter-btn" data-status="Partial">Partial</button>
+            <button class="btn btn-outline btn-sm pay-filter-btn" data-status="Pending">Pending</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Receipt</th><th>Student</th><th>Course</th><th>Fee Amount</th><th>Paid</th><th>Balance</th><th>Date / Method</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="payments-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ REPORTS PAGE ══════ -->
+    <section class="page" id="page-reports">
+      <div class="page-header">
+        <div>
+          <h1>Reports</h1>
+          <p>Analyze fee collection and export data</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-outline" onclick="exportStudentsCSV()">⬇ Students CSV</button>
+          <button class="btn btn-primary" onclick="exportPaymentsCSV()">⬇ Payments CSV</button>
+        </div>
+      </div>
+
+      <!-- Collection summary -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h2>Fee Collection Summary</h2></div>
+          <div class="stats-grid" style="grid-template-columns:1fr 1fr;margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-icon blue">📋</div>
+              <div class="stat-info"><h3 id="rpt-total-due">₹0</h3><p>Total Due</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">💵</div>
+              <div class="stat-info"><h3 id="rpt-collected">₹0</h3><p>Collected</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red">⚠️</div>
+              <div class="stat-info"><h3 id="rpt-balance">₹0</h3><p>Outstanding</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon teal">📊</div>
+              <div class="stat-info"><h3 id="rpt-collection-pct">0%</h3><p>Collection Rate</p></div>
+            </div>
+          </div>
+          <div class="progress" style="height:12px;margin-bottom:8px">
+            <div id="rpt-bar" class="progress-bar" style="width:0%"></div>
+          </div>
+          <hr style="margin:16px 0;border:none;border-top:1px solid var(--border)">
+          <h3 style="font-size:.9rem;margin-bottom:10px">By Payment Method</h3>
+          <div id="rpt-by-method"></div>
+        </div>
+
+        <!-- Course-wise -->
+        <div class="card">
+          <div class="card-header"><h2>Course-wise Collection</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Course</th><th>Dept</th><th>Students</th><th>Due</th><th>Collected</th><th>Balance</th><th>Rate</th>
+              </tr></thead>
+              <tbody id="coursewise-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Defaulters -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Defaulters / Pending Payments</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Student</th><th>Course</th><th>Fee Amount</th><th>Paid</th><th>Balance</th><th>Status</th>
+            </tr></thead>
+            <tbody id="defaulters-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /page-content -->
+</div><!-- /main-wrapper -->
+
+<!-- ══════════════════ TOAST ══════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+
+<!-- Student Modal -->
+<div class="modal-overlay" id="student-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="student-modal-title">Add New Student</h3>
+      <button class="modal-close" onclick="closeModal('student-modal')">&times;</button>
+    </div>
+    <form id="student-form" onsubmit="event.preventDefault(); saveStudent()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input id="student-name" class="form-control" placeholder="Enter full name" required />
+        </div>
+        <div class="form-group">
+          <label>Roll Number *</label>
+          <input id="student-roll" class="form-control" placeholder="e.g. CS2301" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input id="student-email" type="email" class="form-control" placeholder="student@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input id="student-phone" class="form-control" placeholder="10-digit phone" />
+        </div>
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <input id="student-dob" type="date" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="student-gender" class="form-control">
+            <option value="">Select</option>
+            <option>Male</option><option>Female</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Course *</label>
+          <select id="student-course" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label>Year *</label>
+          <select id="student-year" class="form-control">
+            <option value="1">Year 1</option><option value="2">Year 2</option>
+            <option value="3">Year 3</option><option value="4">Year 4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Admission Date</label>
+          <input id="student-admission" type="date" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="student-status" class="form-control">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Address</label>
+          <input id="student-address" class="form-control" placeholder="City / Address" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('student-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Student Modal -->
+<div class="modal-overlay" id="view-student-modal">
+  <div class="modal" style="width:min(720px,95vw)">
+    <div class="modal-header">
+      <h3>Student Details</h3>
+      <button class="modal-close" onclick="closeModal('view-student-modal')">&times;</button>
+    </div>
+    <div id="view-student-info"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('view-student-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Course Modal -->
+<div class="modal-overlay" id="course-modal">
+  <div class="modal" style="width:min(460px,95vw)">
+    <div class="modal-header">
+      <h3 id="course-modal-title">Add New Course</h3>
+      <button class="modal-close" onclick="closeModal('course-modal')">&times;</button>
+    </div>
+    <form id="course-form" onsubmit="event.preventDefault(); saveCourse()">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Course Name *</label>
+          <input id="course-name" class="form-control" placeholder="e.g. B.Tech Computer Science" required />
+        </div>
+        <div class="form-group">
+          <label>Department *</label>
+          <input id="course-dept" class="form-control" placeholder="e.g. Engineering" required />
+        </div>
+        <div class="form-group">
+          <label>Duration (Years) *</label>
+          <select id="course-duration" class="form-control">
+            <option value="1">1</option><option value="2">2</option>
+            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('course-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Course</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Fee Structure Modal -->
+<div class="modal-overlay" id="fee-modal">
+  <div class="modal" style="width:min(500px,95vw)">
+    <div class="modal-header">
+      <h3 id="fee-modal-title">Add Fee Structure</h3>
+      <button class="modal-close" onclick="closeModal('fee-modal')">&times;</button>
+    </div>
+    <form id="fee-form" onsubmit="event.preventDefault(); saveFeeStructure()">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Course *</label>
+          <select id="fee-course" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label>Year *</label>
+          <select id="fee-year" class="form-control">
+            <option value="1">Year 1</option><option value="2">Year 2</option>
+            <option value="3">Year 3</option><option value="4">Year 4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tuition Fee (₹)</label>
+          <input id="fee-tuition" type="number" min="0" class="form-control" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>Exam Fee (₹)</label>
+          <input id="fee-exam" type="number" min="0" class="form-control" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>Library Fee (₹)</label>
+          <input id="fee-library" type="number" min="0" class="form-control" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>Lab Fee (₹)</label>
+          <input id="fee-lab" type="number" min="0" class="form-control" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>Other Fee (₹)</label>
+          <input id="fee-other" type="number" min="0" class="form-control" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label>Total</label>
+          <div class="form-control fw-bold" id="fee-total-display" style="background:var(--bg);cursor:default">₹0</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('fee-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Structure</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal" style="width:min(560px,95vw)">
+    <div class="modal-header">
+      <h3 id="payment-modal-title">Record New Payment</h3>
+      <button class="modal-close" onclick="closeModal('payment-modal')">&times;</button>
+    </div>
+    <form id="payment-form" onsubmit="event.preventDefault(); savePayment()">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Student *</label>
+          <select id="payment-student" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label>Fee Amount (₹) *</label>
+          <input id="payment-amount" type="number" min="0" class="form-control" placeholder="Auto-filled" required />
+        </div>
+        <div class="form-group">
+          <label>Amount Paid (₹) *</label>
+          <input id="payment-paid" type="number" min="0" class="form-control" placeholder="0" required />
+        </div>
+        <div class="form-group">
+          <label>Payment Date</label>
+          <input id="payment-date" type="date" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select id="payment-method" class="form-control">
+            <option value="">Select</option>
+            <option>Cash</option><option>Online</option><option>Cheque</option>
+            <option>DD</option><option>UPI</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Receipt No</label>
+          <input id="payment-receipt" class="form-control" placeholder="Auto-generated" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="payment-status" class="form-control">
+            <option value="">Auto-detect</option>
+            <option>Paid</option><option>Partial</option><option>Pending</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Remarks</label>
+          <input id="payment-remark" class="form-control" placeholder="Optional remark" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('payment-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Payment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════ SCRIPTS ══════════════════ -->
+<script>
+  // Auth guard — redirect to login if not logged in
+  if (!sessionStorage.getItem('cfms_auth')) {
+    window.location.replace('login.html');
+  }
+  function logout() {
+    sessionStorage.removeItem('cfms_auth');
+    window.location.replace('login.html');
+  }
+</script>
+<script src="public/js/db.js"></script>
+<script src="public/js/app.js"></script>
+<script src="public/js/dashboard.js"></script>
+<script src="public/js/students.js"></script>
+<script src="public/js/fees.js"></script>
+<script src="public/js/payments.js"></script>
+<script src="public/js/reports.js"></script>
+
+</body>
+</html>

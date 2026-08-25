@@ -24,21 +24,29 @@ function navigate(pageId) {
   if (link) link.classList.add('active');
 
   const titles = {
-    dashboard: 'Dashboard',
-    students:  'Students',
-    fees:      'Fee Structure',
-    payments:  'Payments',
-    reports:   'Reports',
+    dashboard:  'Dashboard',
+    students:   'Students',
+    fees:       'Fee Structure',
+    payments:   'Payments',
+    reports:    'Reports',
+    subjects:   'Subjects',
+    timetable:  'Timetable',
+    attendance: 'Attendance',
+    exams:      'Exam Results',
   };
   document.getElementById('topbar-title').textContent = titles[pageId] || 'Dashboard';
 
   // refresh page data
   switch (pageId) {
-    case 'dashboard': renderDashboard(); break;
-    case 'students':  renderStudents();  break;
-    case 'fees':      renderFees();      break;
-    case 'payments':  renderPayments();  break;
-    case 'reports':   renderReports();   break;
+    case 'dashboard':  renderDashboard();         break;
+    case 'students':   renderStudents();           break;
+    case 'fees':       renderFees();               break;
+    case 'payments':   renderPayments();           break;
+    case 'reports':    renderReports();            break;
+    case 'subjects':   renderSubjects();           break;
+    case 'timetable':  renderTimetableAdmin();     break;
+    case 'attendance': renderAttendanceAdmin();    break;
+    case 'exams':      renderExamsAdmin();         break;
   }
 
   // close mobile sidebar

@@ -5,494 +5,686 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Portal — Shanmuga Industries Arts and Science College</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI',system-ui,sans-serif; background:#f1f5f9; color:#1e293b; min-height:100vh; }
 
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f1f5f9;
-      color: #1e293b;
-      min-height: 100vh;
+    /* ── Top nav ── */
+    .top-nav {
+      background:linear-gradient(135deg,#1d4ed8,#1e3a8a);
+      color:#fff;
+      position:sticky; top:0; z-index:200;
+      box-shadow:0 2px 10px rgba(0,0,0,.2);
     }
-
-    /* ── Top header band ── */
-    .top-header {
-      background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
-      color: #fff;
-      padding: 0 24px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    .nav-top-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 20px; height:56px;
     }
-    .top-header .logo { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-    .top-header .logo span { font-size: .75rem; opacity: .8; font-weight: 400; display: block; }
+    .nav-logo { font-size:.95rem; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .nav-logo small { font-size:.72rem; opacity:.8; font-weight:400; display:block; }
     .btn-logout {
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.3);
-      color: #fff;
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: .82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .2s;
+      background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
+      color:#fff; padding:6px 14px; border-radius:8px; font-size:.8rem;
+      font-weight:600; cursor:pointer; transition:background .2s;
     }
-    .btn-logout:hover { background: rgba(255,255,255,.25); }
+    .btn-logout:hover { background:rgba(255,255,255,.25); }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      display:flex; overflow-x:auto; background:rgba(0,0,0,.2);
+      scrollbar-width:none;
+    }
+    .tab-bar::-webkit-scrollbar { display:none; }
+    .tab-btn {
+      flex-shrink:0; padding:11px 18px; background:none; border:none;
+      color:rgba(255,255,255,.7); font-size:.82rem; font-weight:600;
+      cursor:pointer; border-bottom:3px solid transparent;
+      transition:all .2s; white-space:nowrap;
+    }
+    .tab-btn:hover { color:#fff; background:rgba(255,255,255,.08); }
+    .tab-btn.active { color:#fff; border-bottom-color:#60a5fa; background:rgba(255,255,255,.1); }
 
     /* ── Profile banner ── */
     .profile-banner {
-      background: linear-gradient(120deg, #1d4ed8 0%, #1e40af 50%, #475569 100%);
-      color: #fff;
-      padding: 28px 24px 24px;
+      background:linear-gradient(120deg,#1d4ed8 0%,#1e40af 50%,#334155 100%);
+      color:#fff; padding:24px 20px 20px;
     }
-    .profile-inner {
-      max-width: 800px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
+    .profile-inner { max-width:860px; margin:0 auto; display:flex; align-items:center; gap:16px; }
     .avatar-circle {
-      width: 70px; height: 70px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.2);
-      border: 3px solid rgba(255,255,255,.5);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem;
-      flex-shrink: 0;
+      width:64px; height:64px; border-radius:50%;
+      background:rgba(255,255,255,.2); border:3px solid rgba(255,255,255,.5);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; font-weight:800; flex-shrink:0;
     }
-    .profile-info h2 { font-size: 1.4rem; font-weight: 800; }
-    .profile-info .roll { font-size: .85rem; opacity: .85; margin-top: 3px; }
-    .profile-info .course-tag {
-      display: inline-block;
-      margin-top: 8px;
-      background: rgba(255,255,255,.2);
-      border: 1px solid rgba(255,255,255,.3);
-      border-radius: 20px;
-      padding: 3px 12px;
-      font-size: .78rem;
-      font-weight: 600;
+    .profile-info h2 { font-size:1.25rem; font-weight:800; }
+    .profile-info .roll { font-size:.82rem; opacity:.85; margin-top:2px; }
+    .course-tag {
+      display:inline-block; margin-top:6px;
+      background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3);
+      border-radius:20px; padding:3px 12px; font-size:.75rem; font-weight:600;
     }
 
-    /* ── Main content ── */
-    .content {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 24px 16px 40px;
-    }
+    /* ── Page wrapper ── */
+    .content { max-width:860px; margin:0 auto; padding:20px 16px 48px; }
+
+    /* ── Tab sections ── */
+    .tab-section { display:none; }
+    .tab-section.active { display:block; }
 
     /* ── Cards ── */
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 1px 6px rgba(0,0,0,.08);
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    .card-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .card-header h3 { font-size: 1rem; font-weight: 700; color: #1e293b; }
-    .card-body { padding: 20px; }
+    .card { background:#fff; border-radius:12px; box-shadow:0 1px 6px rgba(0,0,0,.07); margin-bottom:18px; overflow:hidden; }
+    .card-header { padding:14px 18px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .card-header h3 { font-size:.95rem; font-weight:700; }
+    .card-body { padding:18px; }
+
+    /* ── Stat boxes ── */
+    .stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+    .stat-box { border-radius:12px; padding:16px; text-align:center; }
+    .stat-box .val { font-size:1.3rem; font-weight:800; }
+    .stat-box .lbl { font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-top:3px; }
+    .box-blue   { background:#eff6ff; color:#1d4ed8; }
+    .box-green  { background:#f0fdf4; color:#16a34a; }
+    .box-red    { background:#fef2f2; color:#dc2626; }
+    .box-orange { background:#fff7ed; color:#d97706; }
+    .box-purple { background:#faf5ff; color:#7c3aed; }
 
     /* ── Info grid ── */
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    .info-item .label {
-      font-size: .72rem;
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      color: #94a3b8;
-      margin-bottom: 4px;
-    }
-    .info-item .value {
-      font-size: .92rem;
-      font-weight: 600;
-      color: #1e293b;
-    }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .info-item .lbl { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color:#94a3b8; margin-bottom:3px; }
+    .info-item .val { font-size:.9rem; font-weight:600; color:#1e293b; }
 
-    /* ── Fee summary boxes ── */
-    .fee-summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .fee-box {
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-    }
-    .fee-box .amount { font-size: 1.25rem; font-weight: 800; }
-    .fee-box .label  { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
-    .fee-box.blue   { background: #eff6ff; color: #1d4ed8; }
-    .fee-box.green  { background: #f0fdf4; color: #16a34a; }
-    .fee-box.red    { background: #fef2f2; color: #dc2626; }
-    .fee-box.orange { background: #fff7ed; color: #d97706; }
+    /* ── Tables ── */
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    thead tr { background:#f8fafc; }
+    th { padding:9px 12px; text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; color:#64748b; border-bottom:1px solid #e2e8f0; white-space:nowrap; }
+    td { padding:11px 12px; border-bottom:1px solid #f1f5f9; color:#334155; }
+    tr:last-child td { border-bottom:none; }
+    th:last-child, td:last-child { text-align:right; }
 
-    /* ── Payment history table ── */
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
-    thead tr { background: #f8fafc; }
-    th { padding: 10px 14px; text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; color: #64748b; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-    td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; }
-    tr:last-child td { border-bottom: none; }
-
-    /* ── Status badge ── */
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: .72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .4px;
-    }
-    .badge-paid    { background: #dcfce7; color: #16a34a; }
-    .badge-partial { background: #fef3c7; color: #d97706; }
-    .badge-pending { background: #fee2e2; color: #dc2626; }
+    /* ── Badge ── */
+    .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
+    .b-green  { background:#dcfce7; color:#16a34a; }
+    .b-red    { background:#fee2e2; color:#dc2626; }
+    .b-amber  { background:#fef3c7; color:#d97706; }
+    .b-blue   { background:#dbeafe; color:#1d4ed8; }
+    .b-purple { background:#ede9fe; color:#7c3aed; }
+    .b-gray   { background:#f1f5f9; color:#64748b; }
 
     /* ── Progress bar ── */
-    .progress-wrap { margin: 16px 0 8px; }
-    .progress-label { display: flex; justify-content: space-between; font-size: .8rem; color: #64748b; margin-bottom: 6px; }
-    .progress-bar-bg { background: #e2e8f0; border-radius: 99px; height: 10px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #16a34a, #22c55e); transition: width .6s ease; }
+    .prog-bg { background:#e2e8f0; border-radius:99px; height:10px; overflow:hidden; }
+    .prog-fill { height:100%; border-radius:99px; transition:width .6s ease; }
+    .prog-green  { background:linear-gradient(90deg,#16a34a,#22c55e); }
+    .prog-amber  { background:linear-gradient(90deg,#d97706,#fbbf24); }
+    .prog-red    { background:linear-gradient(90deg,#dc2626,#f87171); }
+
+    /* ── Attendance graph bar ── */
+    .att-bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .att-bar-label { width:140px; font-size:.78rem; color:#475569; font-weight:600; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .att-bar-wrap { flex:1; background:#e2e8f0; border-radius:99px; height:18px; overflow:hidden; position:relative; }
+    .att-bar-fill { height:100%; border-radius:99px; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; font-size:.68rem; font-weight:700; color:#fff; transition:width .7s ease; }
+    .att-bar-pct { width:38px; font-size:.78rem; font-weight:700; text-align:right; flex-shrink:0; }
+
+    /* ── Timetable grid ── */
+    .tt-day-block { margin-bottom:16px; }
+    .tt-day-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#2563eb; margin-bottom:8px; }
+    .tt-slots { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px; }
+    .tt-slot {
+      background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;
+      border-left:3px solid #2563eb;
+    }
+    .tt-slot .time { font-size:.7rem; color:#94a3b8; margin-bottom:3px; }
+    .tt-slot .subj { font-weight:700; font-size:.85rem; color:#1e293b; }
+    .tt-slot .code { font-size:.72rem; color:#2563eb; font-weight:600; margin-top:1px; }
+    .tt-slot .meta { font-size:.72rem; color:#64748b; margin-top:4px; }
+
+    /* ── Course subject row ── */
+    .subj-row { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid #f1f5f9; }
+    .subj-row:last-child { border-bottom:none; }
+    .subj-code-badge { background:#eff6ff; color:#1d4ed8; font-weight:700; font-size:.75rem; padding:4px 9px; border-radius:6px; white-space:nowrap; }
+    .subj-info { flex:1; }
+    .subj-info .name { font-size:.88rem; font-weight:600; }
+    .subj-info .meta { font-size:.72rem; color:#94a3b8; }
+    .subj-credits { font-size:.75rem; font-weight:700; color:#7c3aed; background:#faf5ff; padding:3px 8px; border-radius:6px; }
+
+    /* ── Grade chip ── */
+    .grade-o  { background:#dcfce7; color:#15803d; }
+    .grade-a  { background:#dbeafe; color:#1d4ed8; }
+    .grade-b  { background:#e0e7ff; color:#4338ca; }
+    .grade-c  { background:#fef3c7; color:#b45309; }
+    .grade-d  { background:#fed7aa; color:#c2410c; }
+    .grade-f  { background:#fee2e2; color:#dc2626; }
+
+    /* ── Empty ── */
+    .empty { text-align:center; padding:36px; color:#94a3b8; }
+    .empty .ico { font-size:2.5rem; margin-bottom:8px; }
 
     /* ── Print btn ── */
-    .btn-print {
-      background: #1d4ed8;
-      color: #fff;
-      border: none;
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: .82rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-print:hover { opacity: .88; }
+    .btn-print { background:#1d4ed8; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:.78rem; font-weight:600; cursor:pointer; }
+    .btn-print:hover { opacity:.88; }
 
-    /* ── Empty state ── */
-    .empty { text-align: center; padding: 36px; color: #94a3b8; }
-    .empty .icon { font-size: 2.5rem; margin-bottom: 10px; }
-
-    /* ── No data screen ── */
-    #no-data {
-      display: none;
-      text-align: center;
-      padding: 60px 24px;
-    }
-
-    @media (max-width: 500px) {
-      .fee-summary { grid-template-columns: 1fr 1fr; }
-      .info-grid   { grid-template-columns: 1fr; }
-      .profile-inner { flex-direction: column; text-align: center; }
+    @media(max-width:540px) {
+      .stat-row { grid-template-columns:1fr 1fr; }
+      .info-grid { grid-template-columns:1fr; }
+      .profile-inner { flex-direction:column; text-align:center; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top nav -->
-  <div class="top-header">
-    <div class="logo">
+<!-- Top nav with tabs -->
+<div class="top-nav">
+  <div class="nav-top-row">
+    <div class="nav-logo">
       🎓
-      <div>
-        Shanmuga Industries Arts and Science College
-        <span>Student Fee Portal</span>
-      </div>
+      <div>Shanmuga Industries Arts and Science College<small>Student Portal</small></div>
     </div>
     <button class="btn-logout" onclick="logout()">⬅ Logout</button>
   </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('home',this)">🏠 Home</button>
+    <button class="tab-btn" onclick="showTab('courses',this)">📚 Courses</button>
+    <button class="tab-btn" onclick="showTab('attendance',this)">✔ Attendance</button>
+    <button class="tab-btn" onclick="showTab('timetable',this)">📅 Timetable</button>
+    <button class="tab-btn" onclick="showTab('exams',this)">📝 Exam Results</button>
+    <button class="tab-btn" onclick="showTab('fee',this)">💰 Fee</button>
+  </div>
+</div>
 
-  <!-- Profile banner -->
-  <div class="profile-banner">
-    <div class="profile-inner">
-      <div class="avatar-circle" id="avatar-initials">?</div>
-      <div class="profile-info">
-        <h2 id="student-name">Loading…</h2>
-        <div class="roll" id="student-roll"></div>
-        <div class="course-tag" id="student-course-tag"></div>
+<!-- Profile banner -->
+<div class="profile-banner">
+  <div class="profile-inner">
+    <div class="avatar-circle" id="sp-avatar">?</div>
+    <div class="profile-info">
+      <h2 id="sp-name">Loading…</h2>
+      <div class="roll" id="sp-roll"></div>
+      <div class="course-tag" id="sp-course-tag"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+  <!-- ══ HOME TAB ══ -->
+  <div class="tab-section active" id="tab-home">
+    <div class="stat-row" id="home-stats"></div>
+
+    <div class="card">
+      <div class="card-header"><h3>My Details</h3></div>
+      <div class="card-body">
+        <div class="info-grid" id="sp-info-grid"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>Quick Overview</h3></div>
+      <div class="card-body" id="home-quick"></div>
+    </div>
+  </div>
+
+  <!-- ══ COURSES TAB ══ -->
+  <div class="tab-section" id="tab-courses">
+    <div class="card">
+      <div class="card-header">
+        <h3>📚 Course Registration — Subjects</h3>
+        <span id="courses-meta" style="font-size:.78rem;color:#94a3b8"></span>
+      </div>
+      <div id="courses-subjects-list" class="card-body"></div>
+    </div>
+  </div>
+
+  <!-- ══ ATTENDANCE TAB ══ -->
+  <div class="tab-section" id="tab-attendance">
+    <div class="stat-row" id="att-summary-stats"></div>
+
+    <div class="card">
+      <div class="card-header"><h3>Attendance by Subject</h3></div>
+      <div class="card-body" id="att-bar-chart"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>Attendance Log</h3></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Subject</th><th>Date</th><th style="text-align:right">Status</th></tr></thead>
+          <tbody id="att-log-tbody"></tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Main content -->
-  <div class="content">
+  <!-- ══ TIMETABLE TAB ══ -->
+  <div class="tab-section" id="tab-timetable">
+    <div class="card">
+      <div class="card-header"><h3>📅 Weekly Timetable</h3></div>
+      <div class="card-body" id="sp-timetable"></div>
+    </div>
+  </div>
 
-    <!-- Fee summary -->
-    <div class="fee-summary" id="fee-summary">
-      <div class="fee-box blue">
-        <div class="amount" id="sum-total">₹0</div>
-        <div class="label">Total Fee</div>
-      </div>
-      <div class="fee-box green">
-        <div class="amount" id="sum-paid">₹0</div>
-        <div class="label">Paid</div>
-      </div>
-      <div class="fee-box red" id="balance-box">
-        <div class="amount" id="sum-balance">₹0</div>
-        <div class="label">Balance</div>
+  <!-- ══ EXAM RESULTS TAB ══ -->
+  <div class="tab-section" id="tab-exams">
+    <div class="stat-row" id="exam-summary-stats"></div>
+
+    <div class="card">
+      <div class="card-header"><h3>Result Sheet</h3></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Semester</th><th>Code</th><th>Subject</th>
+              <th>CIE</th><th>SEE</th><th>Total</th><th>Grade</th><th style="text-align:right">Result</th>
+            </tr>
+          </thead>
+          <tbody id="exam-tbody"></tbody>
+        </table>
       </div>
     </div>
+  </div>
 
-    <!-- Payment progress -->
+  <!-- ══ FEE TAB ══ -->
+  <div class="tab-section" id="tab-fee">
+    <div class="stat-row" id="fee-stats"></div>
+
     <div class="card">
       <div class="card-header">
         <h3>Payment Progress</h3>
-        <span id="progress-pct" style="font-weight:800;color:#16a34a">0%</span>
+        <span id="fee-pct" style="font-weight:800;color:#16a34a">0%</span>
       </div>
       <div class="card-body">
-        <div class="progress-wrap">
-          <div class="progress-label">
-            <span>Amount Paid</span>
-            <span id="progress-label-detail"></span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-          </div>
+        <div style="display:flex;justify-content:space-between;font-size:.78rem;color:#64748b;margin-bottom:6px">
+          <span>Amount Paid</span>
+          <span id="fee-prog-detail"></span>
         </div>
+        <div class="prog-bg"><div class="prog-fill prog-green" id="fee-prog-fill" style="width:0%"></div></div>
       </div>
     </div>
 
-    <!-- Student details -->
     <div class="card">
-      <div class="card-header"><h3>My Details</h3></div>
-      <div class="card-body">
-        <div class="info-grid" id="student-info-grid"></div>
+      <div class="card-header"><h3>Payment History</h3></div>
+      <div id="fee-history-wrap">
+        <div class="empty"><div class="ico">💳</div><p>No payment records.</p></div>
       </div>
     </div>
+  </div>
 
-    <!-- Payment history -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Payment History</h3>
-      </div>
-      <div id="payment-history-wrap">
-        <div class="empty">
-          <div class="icon">💳</div>
-          <p>No payment records found.</p>
-        </div>
-      </div>
-    </div>
+</div><!-- /content -->
 
-  </div><!-- /content -->
+<!-- db.js must load first to ensure seed runs -->
+<script src="public/js/db.js"></script>
+<script>
+  // ── Auth guard ───────────────────────────────────────────
+  const authRaw = sessionStorage.getItem('cfms_auth');
+  if (!authRaw) { window.location.replace('login.html'); }
+  const auth = JSON.parse(authRaw);
+  if (auth.role !== 'student') { window.location.replace('index.html'); }
 
-  <script>
-    // ── Auth guard ──────────────────────────────────────────
-    const authRaw = sessionStorage.getItem('cfms_auth');
-    if (!authRaw) { window.location.replace('login.html'); }
+  DB.seed(); // ensure seed data exists (handles v2 re-seed)
 
-    const auth = JSON.parse(authRaw);
-    if (auth.role !== 'student') { window.location.replace('index.html'); }
+  // ── Data ─────────────────────────────────────────────────
+  function loadData() {
+    return {
+      student:      DB.Students.get(auth.studentId),
+      courses:      DB.Courses.all(),
+      payments:     DB.Payments.byStudent(auth.studentId),
+      subjects:     DB.CourseSubjects.all(),
+      timetable:    DB.Timetable.all(),
+      attAll:       DB.Attendance.byStudent(auth.studentId),
+      attSummary:   DB.Attendance.summaryByStudent(auth.studentId),
+      results:      DB.ExamResults.byStudent(auth.studentId),
+    };
+  }
 
-    function logout() {
-      sessionStorage.removeItem('cfms_auth');
-      window.location.replace('login.html');
+  // ── Helpers ──────────────────────────────────────────────
+  const fmtCur = n => '₹' + Number(n||0).toLocaleString('en-IN');
+  const fmtDt  = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const initials = name => name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+  function gradeClass(g) {
+    if (!g) return 'b-gray';
+    const map = { O:'grade-o', 'A+':'grade-a', A:'grade-a', 'B+':'grade-b', B:'grade-b', C:'grade-c', D:'grade-d', F:'grade-f' };
+    return map[g] || 'b-gray';
+  }
+
+  // ── Tab switching ─────────────────────────────────────────
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function logout() {
+    sessionStorage.removeItem('cfms_auth');
+    window.location.replace('login.html');
+  }
+
+  // ── Render all ───────────────────────────────────────────
+  function renderAll() {
+    const d = loadData();
+    if (!d.student) {
+      document.querySelector('.content').innerHTML =
+        '<div class="empty" style="padding:60px"><div class="ico">😕</div><p>Student record not found. Contact admin.</p></div>';
+      return;
     }
 
-    // ── Helpers ─────────────────────────────────────────────
-    function fmtCurrency(n) {
-      if (!n && n !== 0) return '—';
-      return '₹' + Number(n).toLocaleString('en-IN');
-    }
-    function fmtDate(d) {
-      if (!d) return '—';
-      return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-    }
-    function initials(name) {
-      return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    renderBanner(d);
+    renderHome(d);
+    renderCourses(d);
+    renderAttendance(d);
+    renderTimetable(d);
+    renderExams(d);
+    renderFee(d);
+  }
+
+  // ── Banner ───────────────────────────────────────────────
+  function renderBanner(d) {
+    const s = d.student;
+    const c = d.courses.find(c => c.id === s.courseId);
+    document.getElementById('sp-avatar').textContent     = initials(s.name);
+    document.getElementById('sp-name').textContent       = s.name;
+    document.getElementById('sp-roll').textContent       = s.rollNo + ' · ' + (s.gender||'') + ' · ' + (s.status||'');
+    document.getElementById('sp-course-tag').textContent = (c ? c.name : '—') + ' · Year ' + s.year;
+  }
+
+  // ── Home ─────────────────────────────────────────────────
+  function renderHome(d) {
+    const s = d.student;
+    const c = d.courses.find(c => c.id === s.courseId);
+
+    // Stats
+    const totalFee  = d.payments.reduce((a,p)=>a+p.amount,0);
+    const totalPaid = d.payments.reduce((a,p)=>a+p.paidAmount,0);
+    const overallAtt = d.attSummary.length
+      ? Math.round(d.attSummary.reduce((a,x)=>a+x.pct,0)/d.attSummary.length)
+      : null;
+    const passCount = d.results.filter(r=>r.result==='Pass').length;
+
+    document.getElementById('home-stats').innerHTML = `
+      <div class="stat-box box-blue"><div class="val">${d.subjects.filter(s2=>s2.courseId===s.courseId&&s2.year===s.year).length}</div><div class="lbl">Subjects</div></div>
+      <div class="stat-box ${overallAtt===null?'box-blue':overallAtt>=75?'box-green':overallAtt>=60?'box-orange':'box-red'}">
+        <div class="val">${overallAtt!==null?overallAtt+'%':'—'}</div><div class="lbl">Avg Attendance</div></div>
+      <div class="stat-box ${totalFee>0&&totalPaid>=totalFee?'box-green':'box-orange'}">
+        <div class="val">${fmtCur(totalPaid)}</div><div class="lbl">Fee Paid</div></div>`;
+
+    // Info grid
+    document.getElementById('sp-info-grid').innerHTML = `
+      <div class="info-item"><div class="lbl">Roll Number</div><div class="val">${s.rollNo}</div></div>
+      <div class="info-item"><div class="lbl">Full Name</div><div class="val">${s.name}</div></div>
+      <div class="info-item"><div class="lbl">Course</div><div class="val">${c?c.name:'—'}</div></div>
+      <div class="info-item"><div class="lbl">Year</div><div class="val">Year ${s.year}</div></div>
+      <div class="info-item"><div class="lbl">Email</div><div class="val">${s.email||'—'}</div></div>
+      <div class="info-item"><div class="lbl">Phone</div><div class="val">${s.phone||'—'}</div></div>
+      <div class="info-item"><div class="lbl">Date of Birth</div><div class="val">${fmtDt(s.dob)}</div></div>
+      <div class="info-item"><div class="lbl">Admission Date</div><div class="val">${fmtDt(s.admissionDate)}</div></div>
+      <div class="info-item"><div class="lbl">Address</div><div class="val">${s.address||'—'}</div></div>
+      <div class="info-item"><div class="lbl">Status</div><div class="val">${s.status||'—'}</div></div>`;
+
+    // Quick overview
+    const attWarn = d.attSummary.filter(a=>a.pct<75);
+    const failSubj = d.results.filter(r=>r.result==='Fail');
+    let quick = '';
+    if (attWarn.length)
+      quick += `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#92400e">
+        ⚠️ <strong>Low Attendance:</strong> ${attWarn.map(a=>a.subjectCode).join(', ')} — attendance below 75%</div>`;
+    if (failSubj.length)
+      quick += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#991b1b">
+        ❌ <strong>Failed Subjects:</strong> ${failSubj.map(r=>r.subjectCode).join(', ')}</div>`;
+    if (totalFee > 0 && totalPaid < totalFee)
+      quick += `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#1e40af">
+        💰 <strong>Fee Balance:</strong> ${fmtCur(totalFee-totalPaid)} remaining</div>`;
+    if (!quick)
+      quick = `<div style="text-align:center;padding:20px;color:#94a3b8">✅ Everything looks good!</div>`;
+    document.getElementById('home-quick').innerHTML = quick;
+  }
+
+  // ── Courses ──────────────────────────────────────────────
+  function renderCourses(d) {
+    const s   = d.student;
+    const c   = d.courses.find(c => c.id === s.courseId);
+    const subs = d.subjects.filter(sub => sub.courseId === s.courseId && sub.year === s.year);
+
+    document.getElementById('courses-meta').textContent =
+      c ? `${c.name} · Year ${s.year} · ${c.department}` : '';
+
+    const wrap = document.getElementById('courses-subjects-list');
+    if (!subs.length) {
+      wrap.innerHTML = '<div class="empty"><div class="ico">📚</div><p>No subjects registered for your course/year.</p></div>';
+      return;
     }
 
-    // ── Load data ───────────────────────────────────────────
-    const students       = JSON.parse(localStorage.getItem('cfms_students')       || '[]');
-    const courses        = JSON.parse(localStorage.getItem('cfms_courses')        || '[]');
-    const payments       = JSON.parse(localStorage.getItem('cfms_payments')       || '[]');
-    const feeStructures  = JSON.parse(localStorage.getItem('cfms_fee_structures') || '[]');
+    wrap.innerHTML = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:.8rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.5px">
+        <span>Subject Code &amp; Name</span><span>Credits</span>
+      </div>` +
+      subs.map(sub => `
+        <div class="subj-row">
+          <span class="subj-code-badge">${sub.code}</span>
+          <div class="subj-info">
+            <div class="name">${sub.name}</div>
+            <div class="meta">Year ${sub.year}</div>
+          </div>
+          <span class="subj-credits">${sub.credits} cr</span>
+        </div>`).join('') +
+      `<div style="margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9;font-size:.82rem;color:#64748b;font-weight:600">
+        Total Credits: ${subs.reduce((a,s)=>a+(s.credits||0),0)}
+      </div>`;
+  }
 
-    // If nothing seeded yet, seed defaults then reload
-    if (!students.length) {
-      // Dynamically load db.js to trigger seed, then reload
-      const s = document.createElement('script');
-      s.src = 'public/js/db.js';
-      s.onload = () => { DB.seed(); location.reload(); };
-      document.head.appendChild(s);
+  // ── Attendance ───────────────────────────────────────────
+  function renderAttendance(d) {
+    const summary = d.attSummary;
+    const allRecs = d.attAll;
+
+    const totalClasses = summary.reduce((a,s)=>a+s.total,0);
+    const totalPresent = summary.reduce((a,s)=>a+s.present,0);
+    const overallPct   = totalClasses > 0 ? Math.round((totalPresent/totalClasses)*100) : 0;
+    const shortfall    = summary.filter(s=>s.pct<75).length;
+
+    document.getElementById('att-summary-stats').innerHTML = `
+      <div class="stat-box box-blue"><div class="val">${totalClasses}</div><div class="lbl">Total Classes</div></div>
+      <div class="stat-box ${overallPct>=75?'box-green':'box-red'}"><div class="val">${overallPct}%</div><div class="lbl">Overall %</div></div>
+      <div class="stat-box ${shortfall?'box-red':'box-green'}"><div class="val">${shortfall}</div><div class="lbl">Below 75%</div></div>`;
+
+    // Bar chart
+    const barWrap = document.getElementById('att-bar-chart');
+    if (!summary.length) {
+      barWrap.innerHTML = '<div class="empty"><div class="ico">📊</div><p>No attendance data yet.</p></div>';
     } else {
-      renderPortal();
+      barWrap.innerHTML = summary.map(s => {
+        const col = s.pct >= 75 ? '#16a34a' : s.pct >= 60 ? '#d97706' : '#dc2626';
+        return `
+          <div class="att-bar-row">
+            <div class="att-bar-label" title="${s.subjectName}">${s.subjectCode}</div>
+            <div class="att-bar-wrap">
+              <div class="att-bar-fill" style="width:${s.pct}%;background:${col}">${s.pct>=20?s.pct+'%':''}</div>
+            </div>
+            <div class="att-bar-pct" style="color:${col}">${s.pct}%</div>
+          </div>
+          <div style="font-size:.72rem;color:#94a3b8;padding-left:150px;margin-top:-6px;margin-bottom:8px">
+            ${s.subjectName} — ${s.present} present / ${s.absent} absent / ${s.total} total
+          </div>`;
+      }).join('');
     }
 
-    function renderPortal() {
-      const student = students.find(s => s.id === auth.studentId);
-      if (!student) {
-        document.querySelector('.content').innerHTML =
-          '<div style="text-align:center;padding:60px;color:#94a3b8"><div style="font-size:3rem">😕</div><p style="margin-top:12px">Student record not found. Please contact admin.</p></div>';
-        return;
-      }
+    // Log table
+    const tbody = document.getElementById('att-log-tbody');
+    if (!allRecs.length) {
+      tbody.innerHTML = `<tr><td colspan="3"><div class="empty"><div class="ico">📋</div><p>No records.</p></div></td></tr>`;
+      return;
+    }
+    const sorted = [...allRecs].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    tbody.innerHTML = sorted.map(r => `
+      <tr>
+        <td><span class="badge b-blue" style="font-size:.7rem">${r.subjectCode}</span> ${r.subjectName}</td>
+        <td>${fmtDt(r.date)}</td>
+        <td style="text-align:right"><span class="badge ${r.status==='Present'?'b-green':'b-red'}">${r.status}</span></td>
+      </tr>`).join('');
+  }
 
-      const course = courses.find(c => c.id === student.courseId);
+  // ── Timetable ────────────────────────────────────────────
+  const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  function renderTimetable(d) {
+    const s   = d.student;
+    const slots = d.timetable.filter(t => t.courseId === s.courseId && t.year === s.year);
+    const wrap = document.getElementById('sp-timetable');
 
-      // ── Profile banner ──
-      document.getElementById('avatar-initials').textContent = initials(student.name);
-      document.getElementById('student-name').textContent    = student.name;
-      document.getElementById('student-roll').textContent    = student.rollNo + ' · ' + (student.gender || '') + ' · ' + (student.status || '');
-      document.getElementById('student-course-tag').textContent =
-        (course ? course.name : '—') + ' · Year ' + student.year;
+    if (!slots.length) {
+      wrap.innerHTML = '<div class="empty"><div class="ico">📅</div><p>No timetable set for your class yet.</p></div>';
+      return;
+    }
 
-      // ── Student info grid ──
-      document.getElementById('student-info-grid').innerHTML = `
-        <div class="info-item"><div class="label">Roll Number</div><div class="value">${student.rollNo}</div></div>
-        <div class="info-item"><div class="label">Full Name</div><div class="value">${student.name}</div></div>
-        <div class="info-item"><div class="label">Course</div><div class="value">${course ? course.name : '—'}</div></div>
-        <div class="info-item"><div class="label">Year</div><div class="value">Year ${student.year}</div></div>
-        <div class="info-item"><div class="label">Email</div><div class="value">${student.email || '—'}</div></div>
-        <div class="info-item"><div class="label">Phone</div><div class="value">${student.phone || '—'}</div></div>
-        <div class="info-item"><div class="label">Date of Birth</div><div class="value">${fmtDate(student.dob)}</div></div>
-        <div class="info-item"><div class="label">Admission Date</div><div class="value">${fmtDate(student.admissionDate)}</div></div>
-        <div class="info-item"><div class="label">Address</div><div class="value">${student.address || '—'}</div></div>
-        <div class="info-item"><div class="label">Status</div><div class="value">${student.status || '—'}</div></div>
-      `;
+    const byDay = {};
+    DAYS.forEach(d => byDay[d] = []);
+    slots.forEach(sl => { if(byDay[sl.day]) byDay[sl.day].push(sl); });
 
-      // ── Payments for this student ──
-      const myPayments = payments.filter(p => p.studentId === student.id);
-
-      const totalFee  = myPayments.reduce((s, p) => s + (p.amount || 0), 0);
-      const totalPaid = myPayments.reduce((s, p) => s + (p.paidAmount || 0), 0);
-      const balance   = totalFee - totalPaid;
-      const pct       = totalFee > 0 ? Math.round((totalPaid / totalFee) * 100) : 0;
-
-      // Fee summary
-      document.getElementById('sum-total').textContent   = fmtCurrency(totalFee);
-      document.getElementById('sum-paid').textContent    = fmtCurrency(totalPaid);
-      document.getElementById('sum-balance').textContent = fmtCurrency(balance);
-
-      // Progress
-      document.getElementById('progress-pct').textContent          = pct + '%';
-      document.getElementById('progress-fill').style.width         = pct + '%';
-      document.getElementById('progress-label-detail').textContent = fmtCurrency(totalPaid) + ' of ' + fmtCurrency(totalFee);
-
-      // Change balance box color if fully paid
-      if (balance === 0 && totalFee > 0) {
-        document.getElementById('balance-box').className = 'fee-box green';
-      }
-
-      // ── Payment history table ──
-      const wrap = document.getElementById('payment-history-wrap');
-      if (!myPayments.length) return; // keeps the empty state
-
-      wrap.innerHTML = `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Receipt</th>
-                <th>Date</th>
-                <th>Method</th>
-                <th>Fee</th>
-                <th>Paid</th>
-                <th>Balance</th>
-                <th>Status</th>
-                <th>Print</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${myPayments.map(p => {
-                const bal = p.amount - p.paidAmount;
-                const badgeCls = p.status === 'Paid' ? 'badge-paid' : p.status === 'Partial' ? 'badge-partial' : 'badge-pending';
-                return `<tr>
-                  <td style="font-weight:700">${p.receiptNo || '—'}</td>
-                  <td>${fmtDate(p.paymentDate)}</td>
-                  <td>${p.method || '—'}</td>
-                  <td>${fmtCurrency(p.amount)}</td>
-                  <td style="color:#16a34a;font-weight:700">${fmtCurrency(p.paidAmount)}</td>
-                  <td style="color:${bal > 0 ? '#dc2626' : '#16a34a'};font-weight:700">${fmtCurrency(bal)}</td>
-                  <td><span class="badge ${badgeCls}">${p.status}</span></td>
-                  <td><button class="btn-print" onclick="printReceipt(${p.id})">🖨️</button></td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
+    wrap.innerHTML = DAYS.filter(day => byDay[day].length).map(day => `
+      <div class="tt-day-block">
+        <div class="tt-day-label">${day}</div>
+        <div class="tt-slots">
+          ${byDay[day].sort((a,b)=>a.period.localeCompare(b.period)).map(sl=>`
+            <div class="tt-slot">
+              <div class="time">${sl.period}</div>
+              <div class="subj">${sl.subjectName}</div>
+              <div class="code">${sl.subjectCode}</div>
+              <div class="meta">${sl.faculty||''}${sl.room?' · '+sl.room:''}</div>
+            </div>`).join('')}
         </div>
-      `;
+      </div>`).join('');
+  }
+
+  // ── Exam Results ─────────────────────────────────────────
+  function renderExams(d) {
+    const results = d.results;
+    const passed  = results.filter(r=>r.result==='Pass').length;
+    const failed  = results.filter(r=>r.result==='Fail').length;
+    const avg     = results.length
+      ? Math.round(results.reduce((a,r)=>a+(r.totalMarks/(r.maxMarks||100))*100,0)/results.length)
+      : 0;
+
+    document.getElementById('exam-summary-stats').innerHTML = `
+      <div class="stat-box box-blue"><div class="val">${results.length}</div><div class="lbl">Subjects</div></div>
+      <div class="stat-box box-green"><div class="val">${passed}</div><div class="lbl">Passed</div></div>
+      <div class="stat-box ${failed?'box-red':'box-green'}"><div class="val">${failed}</div><div class="lbl">Failed</div></div>`;
+
+    const tbody = document.getElementById('exam-tbody');
+    if (!results.length) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ico">📝</div><p>No results published yet.</p></div></td></tr>`;
+      return;
     }
 
-    // ── Print receipt ────────────────────────────────────────
-    function printReceipt(paymentId) {
-      const p = payments.find(x => x.id === paymentId);
-      if (!p) return;
-      const s  = students.find(x => x.id === p.studentId);
-      const c  = s ? courses.find(x => x.id === s.courseId) : null;
-      const bal = p.amount - p.paidAmount;
+    tbody.innerHTML = results.map(r => `
+      <tr>
+        <td>${r.semester}</td>
+        <td><span class="badge b-blue" style="font-size:.7rem">${r.subjectCode}</span></td>
+        <td>${r.subjectName}</td>
+        <td>${r.cieMarks??'—'}</td>
+        <td>${r.seeMarks??'—'}</td>
+        <td class="fw-bold">${r.totalMarks??'—'}<span style="color:#94a3b8;font-weight:400">/${r.maxMarks??100}</span></td>
+        <td><span class="badge ${gradeClass(r.grade)}" style="font-size:.75rem">${r.grade||'—'}</span></td>
+        <td><span class="badge ${r.result==='Pass'?'b-green':'b-red'}">${r.result||'—'}</span></td>
+      </tr>`).join('');
+  }
 
-      const statusColor = p.status === 'Paid' ? '#16a34a' : p.status === 'Partial' ? '#d97706' : '#dc2626';
-      const statusBg    = p.status === 'Paid' ? '#dcfce7' : p.status === 'Partial' ? '#fef3c7' : '#fee2e2';
+  // ── Fee ──────────────────────────────────────────────────
+  function renderFee(d) {
+    const payments  = d.payments;
+    const totalFee  = payments.reduce((a,p)=>a+p.amount,0);
+    const totalPaid = payments.reduce((a,p)=>a+p.paidAmount,0);
+    const balance   = totalFee - totalPaid;
+    const pct       = totalFee > 0 ? Math.round((totalPaid/totalFee)*100) : 0;
 
-      const win = window.open('', '_blank', 'width=680,height=800');
-      win.document.write(`<!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"/>
-<title>Fee Receipt — ${p.receiptNo || 'N/A'}</title>
+    document.getElementById('fee-stats').innerHTML = `
+      <div class="stat-box box-blue"><div class="val">${fmtCur(totalFee)}</div><div class="lbl">Total Fee</div></div>
+      <div class="stat-box box-green"><div class="val">${fmtCur(totalPaid)}</div><div class="lbl">Paid</div></div>
+      <div class="stat-box ${balance>0?'box-red':'box-green'}"><div class="val">${fmtCur(balance)}</div><div class="lbl">Balance</div></div>`;
+
+    document.getElementById('fee-pct').textContent       = pct + '%';
+    document.getElementById('fee-prog-fill').style.width = pct + '%';
+    document.getElementById('fee-prog-detail').textContent = fmtCur(totalPaid) + ' of ' + fmtCur(totalFee);
+
+    const wrap = document.getElementById('fee-history-wrap');
+    if (!payments.length) return;
+
+    wrap.innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Receipt</th><th>Date</th><th>Method</th><th>Fee</th><th>Paid</th><th>Balance</th><th>Status</th><th>Print</th></tr></thead>
+          <tbody>
+            ${payments.map(p => {
+              const bal = p.amount - p.paidAmount;
+              const sc  = p.status==='Paid'?'b-green':p.status==='Partial'?'b-amber':'b-red';
+              return `<tr>
+                <td style="font-weight:700">${p.receiptNo||'—'}</td>
+                <td>${fmtDt(p.paymentDate)}</td>
+                <td>${p.method||'—'}</td>
+                <td>${fmtCur(p.amount)}</td>
+                <td style="color:#16a34a;font-weight:700">${fmtCur(p.paidAmount)}</td>
+                <td style="color:${bal>0?'#dc2626':'#16a34a'};font-weight:700">${fmtCur(bal)}</td>
+                <td><span class="badge ${sc}">${p.status}</span></td>
+                <td><button class="btn-print" onclick="printReceipt(${p.id})">🖨️</button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  // ── Print Receipt ─────────────────────────────────────────
+  function printReceipt(paymentId) {
+    const p = DB.Payments.get(paymentId);
+    if (!p) return;
+    const s   = DB.Students.get(p.studentId);
+    const c   = s ? DB.Courses.get(s.courseId) : null;
+    const bal = p.amount - p.paidAmount;
+    const statusColor = p.status==='Paid'?'#16a34a':p.status==='Partial'?'#d97706':'#dc2626';
+    const statusBg    = p.status==='Paid'?'#dcfce7':p.status==='Partial'?'#fef3c7':'#fee2e2';
+
+    const win = window.open('','_blank','width=680,height=800');
+    win.document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>
+<title>Fee Receipt — ${p.receiptNo||'N/A'}</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;display:flex;justify-content:center;padding:30px 16px;color:#1e293b}
-  .receipt{background:#fff;width:600px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.1);overflow:hidden}
-  .rh{background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 60%,#3b82f6 100%);color:#fff;padding:28px 32px 20px;position:relative}
-  .rh .cn{font-size:1.15rem;font-weight:700}
-  .rh .cs{font-size:.8rem;opacity:.85;margin-top:2px}
-  .rh .rn{position:absolute;top:28px;right:32px;text-align:right}
-  .rh .rn span{display:block;font-size:.7rem;opacity:.75;text-transform:uppercase;letter-spacing:.8px}
-  .rh .rn strong{font-size:1.05rem}
-  .sr{background:${statusBg};color:${statusColor};text-align:center;font-size:.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px;border-bottom:1px solid ${statusColor}33}
-  .rb{padding:28px 32px}
-  .st{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;font-weight:600;margin-bottom:10px}
-  .ig{display:grid;grid-template-columns:1fr 1fr;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:22px}
-  .ic{padding:11px 14px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0}
-  .ic:nth-child(even){border-right:none}
-  .ic:nth-last-child(-n+2){border-bottom:none}
-  .ic .l{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
-  .ic .v{font-size:.88rem;font-weight:600}
-  .ft{width:100%;border-collapse:collapse;margin-bottom:22px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
-  .ft thead tr{background:#f8fafc}
-  .ft th{padding:9px 14px;font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:#64748b;text-align:left;border-bottom:1px solid #e2e8f0}
-  .ft th:last-child,.ft td:last-child{text-align:right}
-  .ft td{padding:10px 14px;font-size:.88rem;color:#334155;border-bottom:1px solid #f1f5f9}
-  .ft tr:last-child td{border-bottom:none}
-  .ft .tr td{background:#eff6ff;font-weight:700;font-size:.95rem;color:#1d4ed8;border-top:2px solid #bfdbfe}
-  .ft .br td{font-weight:700;color:${bal > 0 ? '#dc2626' : '#16a34a'}}
-  .ss{display:flex;justify-content:space-between;padding:0 8px;margin-bottom:28px}
-  .sb{text-align:center;width:30%}
-  .sl{border-top:1px solid #cbd5e1;margin-bottom:6px;margin-top:44px}
-  .sb span{font-size:.72rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px}
-  .rf{background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;padding:12px;font-size:.72rem;color:#94a3b8}
-  @media print{body{background:#fff;padding:0}.receipt{box-shadow:none;border-radius:0;width:100%}}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;display:flex;justify-content:center;padding:30px 16px;color:#1e293b}
+.receipt{background:#fff;width:600px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.1);overflow:hidden}
+.rh{background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;padding:28px 32px 20px;position:relative}
+.rh .cn{font-size:1.15rem;font-weight:700}.rh .cs{font-size:.8rem;opacity:.85;margin-top:2px}
+.rh .rn{position:absolute;top:28px;right:32px;text-align:right}
+.rh .rn span{display:block;font-size:.7rem;opacity:.75;text-transform:uppercase;letter-spacing:.8px}
+.rh .rn strong{font-size:1.05rem}
+.sr{background:${statusBg};color:${statusColor};text-align:center;font-size:.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px;border-bottom:1px solid ${statusColor}33}
+.rb{padding:28px 32px}
+.st{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;font-weight:600;margin-bottom:10px}
+.ig{display:grid;grid-template-columns:1fr 1fr;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:22px}
+.ic{padding:11px 14px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0}
+.ic:nth-child(even){border-right:none}.ic:nth-last-child(-n+2){border-bottom:none}
+.ic .l{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.ic .v{font-size:.88rem;font-weight:600}
+.ft{width:100%;border-collapse:collapse;margin-bottom:22px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
+.ft thead tr{background:#f8fafc}.ft th{padding:9px 14px;font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:#64748b;text-align:left;border-bottom:1px solid #e2e8f0}
+.ft th:last-child,.ft td:last-child{text-align:right}.ft td{padding:10px 14px;font-size:.88rem;color:#334155;border-bottom:1px solid #f1f5f9}
+.ft tr:last-child td{border-bottom:none}.ft .tr td{background:#eff6ff;font-weight:700;font-size:.95rem;color:#1d4ed8;border-top:2px solid #bfdbfe}
+.ft .br td{font-weight:700;color:${bal>0?'#dc2626':'#16a34a'}}
+.ss{display:flex;justify-content:space-between;padding:0 8px;margin-bottom:28px}
+.sb{text-align:center;width:30%}.sl{border-top:1px solid #cbd5e1;margin-bottom:6px;margin-top:44px}
+.sb span{font-size:.72rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px}
+.rf{background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;padding:12px;font-size:.72rem;color:#94a3b8}
+@media print{body{background:#fff;padding:0}.receipt{box-shadow:none;border-radius:0;width:100%}}
 </style></head><body>
 <div class="receipt">
   <div class="rh">
     <div class="cn">🎓 Shanmuga Industries Arts and Science College</div>
     <div class="cs">Official Fee Payment Receipt</div>
-    <div class="rn"><span>Receipt No.</span><strong>${p.receiptNo || '—'}</strong></div>
+    <div class="rn"><span>Receipt No.</span><strong>${p.receiptNo||'—'}</strong></div>
   </div>
-  <div class="sr">Payment Status: ${p.status || '—'}</div>
+  <div class="sr">Payment Status: ${p.status||'—'}</div>
   <div class="rb">
     <div class="st">Student Information</div>
     <div class="ig">
-      <div class="ic"><div class="l">Student Name</div><div class="v">${s ? s.name : '—'}</div></div>
-      <div class="ic"><div class="l">Roll Number</div><div class="v">${s ? s.rollNo : '—'}</div></div>
-      <div class="ic"><div class="l">Course</div><div class="v">${c ? c.name : '—'}</div></div>
-      <div class="ic"><div class="l">Year of Study</div><div class="v">${s ? 'Year ' + s.year : '—'}</div></div>
-      <div class="ic"><div class="l">Payment Date</div><div class="v">${p.paymentDate ? new Date(p.paymentDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</div></div>
-      <div class="ic"><div class="l">Payment Method</div><div class="v">${p.method || '—'}</div></div>
+      <div class="ic"><div class="l">Student Name</div><div class="v">${s?s.name:'—'}</div></div>
+      <div class="ic"><div class="l">Roll Number</div><div class="v">${s?s.rollNo:'—'}</div></div>
+      <div class="ic"><div class="l">Course</div><div class="v">${c?c.name:'—'}</div></div>
+      <div class="ic"><div class="l">Year of Study</div><div class="v">${s?'Year '+s.year:'—'}</div></div>
+      <div class="ic"><div class="l">Payment Date</div><div class="v">${p.paymentDate?new Date(p.paymentDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—'}</div></div>
+      <div class="ic"><div class="l">Payment Method</div><div class="v">${p.method||'—'}</div></div>
     </div>
     <div class="st">Fee Details</div>
     <table class="ft">
@@ -503,33 +695,22 @@
         <tr class="br"><td>Balance Due</td><td>₹${Number(bal).toLocaleString('en-IN')}</td></tr>
       </tbody>
     </table>
-    ${p.remark ? `<div class="st">Remarks</div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:11px 14px;font-size:.83rem;color:#475569;margin-bottom:22px">${p.remark}</div>` : ''}
+    ${p.remark?`<div class="st">Remarks</div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:11px 14px;font-size:.83rem;color:#475569;margin-bottom:22px">${p.remark}</div>`:''}
     <div class="ss">
       <div class="sb"><div class="sl"></div><span>Student Signature</span></div>
       <div class="sb"><div class="sl"></div><span>Accounts Officer</span></div>
       <div class="sb"><div class="sl"></div><span>Principal</span></div>
     </div>
   </div>
-  <div class="rf">This is a computer-generated receipt. Generated on ${new Date().toLocaleString('en-IN')}</div>
+  <div class="rf">Computer-generated receipt. Generated on ${new Date().toLocaleString('en-IN')}</div>
 </div>
 <script>window.onload=()=>{window.print()}<\/script>
 </body></html>`);
-      win.document.close();
-    }
-  </script>
+    win.document.close();
+  }
 
-  <!-- Load db.js to ensure seed data exists -->
-  <script src="public/js/db.js"></script>
-  <script>
-    DB.seed();
-    // If portal rendered before seed, re-render now
-    if (!document.getElementById('student-info-grid').innerHTML.trim()) {
-      const students2      = JSON.parse(localStorage.getItem('cfms_students')       || '[]');
-      const courses2       = JSON.parse(localStorage.getItem('cfms_courses')        || '[]');
-      const payments2      = JSON.parse(localStorage.getItem('cfms_payments')       || '[]');
-      if (students2.length) location.reload();
-    }
-  </script>
-
+  // Boot
+  renderAll();
+</script>
 </body>
 </html>

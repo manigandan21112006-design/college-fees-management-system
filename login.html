@@ -27,7 +27,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .login-left::before {
       content: '';
       position: absolute;
@@ -44,9 +43,7 @@
       border-radius: 50%;
       bottom: -60px; left: -60px;
     }
-
     .left-content { position: relative; z-index: 1; text-align: center; max-width: 380px; }
-
     .college-emblem {
       width: 90px; height: 90px;
       background: rgba(255,255,255,.12);
@@ -55,45 +52,12 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 2.4rem;
       margin: 0 auto 24px;
-      backdrop-filter: blur(8px);
     }
-
-    .left-content h1 {
-      font-size: 1.5rem;
-      font-weight: 800;
-      line-height: 1.3;
-      margin-bottom: 10px;
-    }
-
-    .left-content p {
-      font-size: .9rem;
-      color: #93c5fd;
-      line-height: 1.6;
-      margin-bottom: 36px;
-    }
-
-    .feature-list {
-      list-style: none;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .feature-list li {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: .85rem;
-      color: #cbd5e1;
-    }
-
-    .feature-list li span.dot {
-      width: 8px; height: 8px;
-      background: #60a5fa;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .left-content h1 { font-size: 1.5rem; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
+    .left-content p  { font-size: .9rem; color: #93c5fd; line-height: 1.6; margin-bottom: 36px; }
+    .feature-list { list-style: none; text-align: left; display: flex; flex-direction: column; gap: 12px; }
+    .feature-list li { display: flex; align-items: center; gap: 10px; font-size: .85rem; color: #cbd5e1; }
+    .feature-list li span.dot { width: 8px; height: 8px; background: #60a5fa; border-radius: 50%; flex-shrink: 0; }
 
     /* ── Right panel ── */
     .login-right {
@@ -104,52 +68,44 @@
       padding: 48px 40px;
       background: #fff;
     }
+    .login-logo-sm { font-size: 1.6rem; margin-bottom: 6px; }
+    .login-right h2 { font-size: 1.6rem; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
+    .login-right .subtitle { font-size: .88rem; color: #64748b; margin-bottom: 28px; }
 
-    .login-logo-sm {
-      font-size: 1.6rem;
-      margin-bottom: 6px;
-    }
-
-    .login-right h2 {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #1e293b;
-      margin-bottom: 6px;
-    }
-
-    .login-right .subtitle {
-      font-size: .88rem;
-      color: #64748b;
-      margin-bottom: 36px;
-    }
-
-    .form-group {
+    /* ── Role toggle ── */
+    .role-toggle {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 18px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
     }
-
-    .form-group label {
-      font-size: .82rem;
-      font-weight: 700;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: .04em;
+    .role-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: #64748b;
+      transition: all .2s;
     }
-
-    .input-wrap {
-      position: relative;
+    .role-btn.active {
+      background: #fff;
+      color: #1e293b;
+      box-shadow: 0 1px 4px rgba(0,0,0,.12);
     }
+    .role-btn.active.admin-active { color: #1d4ed8; }
+    .role-btn.active.student-active { color: #16a34a; }
 
-    .input-wrap .input-icon {
-      position: absolute;
-      left: 13px; top: 50%;
-      transform: translateY(-50%);
-      color: #94a3b8;
-      pointer-events: none;
-    }
-
+    /* ── Forms ── */
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+    .form-group label { font-size: .82rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .04em; }
+    .input-wrap { position: relative; }
+    .input-wrap .input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
     .form-control {
       width: 100%;
       padding: 11px 12px 11px 40px;
@@ -161,96 +117,59 @@
       outline: none;
       transition: border-color .2s, box-shadow .2s, background .2s;
     }
+    .form-control:focus { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    .form-control.green-focus:focus { border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
 
-    .form-control:focus {
-      border-color: #2563eb;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    /* DOB row — three selects side by side */
+    .dob-row { display: flex; gap: 8px; }
+    .dob-row select {
+      flex: 1;
+      padding: 11px 8px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: .88rem;
+      color: #1e293b;
+      background: #f8fafc;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: auto;
     }
+    .dob-row select:focus { border-color: #16a34a; background: #fff; box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
 
-    .toggle-pw {
-      position: absolute;
-      right: 12px; top: 50%;
-      transform: translateY(-50%);
-      background: none; border: none;
-      cursor: pointer; color: #94a3b8;
-      font-size: .85rem;
-      padding: 2px 4px;
-    }
+    .toggle-pw { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: .85rem; padding: 2px 4px; }
     .toggle-pw:hover { color: #2563eb; }
 
     .error-msg {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fca5a5;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: .85rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: none;
+      background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+      border-radius: 8px; padding: 10px 14px; font-size: .85rem; font-weight: 600;
+      margin-bottom: 16px; display: none;
     }
-
     .error-msg.show { display: block; }
 
     .btn-login {
-      width: 100%;
-      padding: 13px;
+      width: 100%; padding: 13px;
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: .95rem;
-      font-weight: 700;
-      cursor: pointer;
+      color: #fff; border: none; border-radius: 10px;
+      font-size: .95rem; font-weight: 700; cursor: pointer;
       transition: opacity .2s, transform .1s;
-      margin-top: 6px;
-      letter-spacing: .02em;
+      margin-top: 6px; letter-spacing: .02em;
     }
-
+    .btn-login.green { background: linear-gradient(135deg, #16a34a, #15803d); }
     .btn-login:hover { opacity: .92; }
     .btn-login:active { transform: scale(.98); }
+    .btn-login:disabled { opacity: .6; cursor: not-allowed; }
 
-    .btn-login:disabled {
-      opacity: .6;
-      cursor: not-allowed;
+    .login-footer { margin-top: 32px; text-align: center; font-size: .78rem; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 20px; }
+
+    .hint-box {
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+      padding: 10px 14px; font-size: .8rem; color: #166534; margin-bottom: 20px;
     }
+    .hint-box strong { color: #14532d; }
 
-    .login-footer {
-      margin-top: 32px;
-      text-align: center;
-      font-size: .78rem;
-      color: #94a3b8;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 20px;
-    }
-
-    .credentials-hint {
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: .8rem;
-      color: #0369a1;
-      margin-bottom: 20px;
-    }
-
-    .credentials-hint strong { color: #0c4a6e; }
-
-    /* ── Loading spinner ── */
-    .spinner {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2.5px solid rgba(255,255,255,.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Responsive ── */
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .login-left { display: none; }
@@ -267,7 +186,7 @@
       <h1>Shanmuga Industries Arts and Science College</h1>
       <p>College Fees Management System — secure, fast, and easy fee tracking for students and staff.</p>
       <ul class="feature-list">
-        <li><span class="dot"></span>Manage student records & fee structures</li>
+        <li><span class="dot"></span>Manage student records &amp; fee structures</li>
         <li><span class="dot"></span>Record and track payments in real-time</li>
         <li><span class="dot"></span>Generate reports and export CSV data</li>
         <li><span class="dot"></span>Print official fee receipts instantly</li>
@@ -281,59 +200,68 @@
     <h2>Welcome back!</h2>
     <p class="subtitle">Sign in to access the fees management portal</p>
 
-    <!-- Credentials hint -->
-    <!-- <div class="credentials-hint">
-      <strong>Default credentials:</strong><br>
-      Username: <strong>manigandan</strong> &nbsp;|&nbsp; Password: <strong>siasc@123</strong>
-    </div> -->
-
-    <!-- Error message -->
-    <div class="error-msg" id="error-msg">
-      ❌ Invalid username or password. Please try again.
+    <!-- Role toggle -->
+    <div class="role-toggle">
+      <button class="role-btn active admin-active" id="btn-admin" onclick="switchRole('admin')">🛡️ Admin / Staff</button>
+      <button class="role-btn" id="btn-student" onclick="switchRole('student')">🎓 Student</button>
     </div>
 
-    <form id="login-form" onsubmit="handleLogin(event)">
+    <!-- Error message -->
+    <div class="error-msg" id="error-msg"></div>
 
-      <!-- Username -->
+    <!-- ── ADMIN FORM ── -->
+    <form id="admin-form" onsubmit="handleAdminLogin(event)">
       <div class="form-group">
         <label>Username</label>
         <div class="input-wrap">
-          <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          <input
-            type="text"
-            id="username"
-            class="form-control"
-            placeholder="Enter your username"
-            autocomplete="username"
-            required
-          />
+          <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="admin-username" class="form-control" placeholder="Enter your username" autocomplete="username" required />
         </div>
       </div>
-
-      <!-- Password -->
       <div class="form-group">
         <label>Password</label>
         <div class="input-wrap">
-          <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          <input
-            type="password"
-            id="password"
-            class="form-control"
-            placeholder="Enter your password"
-            autocomplete="current-password"
-            required
-          />
-          <button type="button" class="toggle-pw" onclick="togglePassword()" id="toggle-pw-btn" title="Show/hide password">👁</button>
+          <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="admin-password" class="form-control" placeholder="Enter your password" autocomplete="current-password" required />
+          <button type="button" class="toggle-pw" onclick="togglePassword()" id="toggle-pw-btn">👁</button>
         </div>
       </div>
+      <button type="submit" class="btn-login" id="admin-login-btn">Sign In</button>
+    </form>
 
-      <button type="submit" class="btn-login" id="login-btn">Sign In</button>
+    <!-- ── STUDENT FORM ── -->
+    <form id="student-form" onsubmit="handleStudentLogin(event)" style="display:none">
+      <div class="hint-box">
+        Use your <strong>Roll Number</strong> and <strong>Date of Birth</strong> to login.
+      </div>
+      <div class="form-group">
+        <label>Roll Number (USN)</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="student-roll" class="form-control green-focus" placeholder="e.g. CS2301" autocomplete="off" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Date of Birth (Password)</label>
+        <div class="dob-row">
+          <select id="dob-day">
+            <option value="">Day</option>
+            <script>for(let d=1;d<=31;d++) document.write(`<option value="${String(d).padStart(2,'0')}">${d}</option>`);</script>
+          </select>
+          <select id="dob-month">
+            <option value="">Month</option>
+            <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+            <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+            <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <select id="dob-year">
+            <option value="">Year</option>
+            <script>for(let y=new Date().getFullYear()-15; y>=1990; y--) document.write(`<option value="${y}">${y}</option>`);</script>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn-login green" id="student-login-btn">Login as Student</button>
     </form>
 
     <div class="login-footer">
@@ -343,60 +271,127 @@
   </div>
 
   <script>
-    // If already logged in, go straight to dashboard
-    if (sessionStorage.getItem('cfms_auth')) {
-      window.location.replace('index.html');
+    // Already logged in → redirect
+    const auth = sessionStorage.getItem('cfms_auth');
+    if (auth) {
+      const a = JSON.parse(auth);
+      window.location.replace(a.role === 'student' ? 'student-portal.html' : 'index.html');
     }
 
-    // Credentials (plain-text for a browser-only app)
-    const USERS = [
+    // Admin credentials
+    const ADMINS = [
       { username: 'manigandan', password: 'siasc@123', display: 'Manigandan' },
       { username: 'admin',      password: 'admin123',  display: 'Admin'      },
     ];
 
-    function handleLogin(e) {
-      e.preventDefault();
-      const btn      = document.getElementById('login-btn');
-      const errorEl  = document.getElementById('error-msg');
-      const username = document.getElementById('username').value.trim().toLowerCase();
-      const password = document.getElementById('password').value;
+    let currentRole = 'admin';
 
-      // Show loading state
-      btn.disabled   = true;
-      btn.innerHTML  = '<span class="spinner"></span>Signing in…';
+    function switchRole(role) {
+      currentRole = role;
+      const adminForm   = document.getElementById('admin-form');
+      const studentForm = document.getElementById('student-form');
+      const btnAdmin    = document.getElementById('btn-admin');
+      const btnStudent  = document.getElementById('btn-student');
+      const errorEl     = document.getElementById('error-msg');
+
+      errorEl.classList.remove('show');
+
+      if (role === 'admin') {
+        adminForm.style.display   = '';
+        studentForm.style.display = 'none';
+        btnAdmin.classList.add('active', 'admin-active');
+        btnAdmin.classList.remove('student-active');
+        btnStudent.classList.remove('active', 'admin-active', 'student-active');
+      } else {
+        adminForm.style.display   = 'none';
+        studentForm.style.display = '';
+        btnStudent.classList.add('active', 'student-active');
+        btnStudent.classList.remove('admin-active');
+        btnAdmin.classList.remove('active', 'admin-active', 'student-active');
+      }
+    }
+
+    // ── Admin login ──
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const btn      = document.getElementById('admin-login-btn');
+      const errorEl  = document.getElementById('error-msg');
+      const username = document.getElementById('admin-username').value.trim().toLowerCase();
+      const password = document.getElementById('admin-password').value;
+
+      btn.disabled  = true;
+      btn.innerHTML = '<span class="spinner"></span>Signing in…';
       errorEl.classList.remove('show');
 
       setTimeout(() => {
-        const user = USERS.find(u => u.username === username && u.password === password);
+        const user = ADMINS.find(u => u.username === username && u.password === password);
         if (user) {
           sessionStorage.setItem('cfms_auth', JSON.stringify({
-            username: user.username,
-            display:  user.display,
-            loginAt:  new Date().toISOString(),
+            username: user.username, display: user.display,
+            role: 'admin', loginAt: new Date().toISOString(),
           }));
           window.location.replace('index.html');
         } else {
+          errorEl.textContent = '❌ Invalid username or password. Please try again.';
           errorEl.classList.add('show');
           btn.disabled  = false;
           btn.innerHTML = 'Sign In';
-          document.getElementById('password').value = '';
-          document.getElementById('password').focus();
+          document.getElementById('admin-password').value = '';
         }
-      }, 600); // small delay for UX
+      }, 600);
+    }
+
+    // ── Student login ──
+    function handleStudentLogin(e) {
+      e.preventDefault();
+      const btn     = document.getElementById('student-login-btn');
+      const errorEl = document.getElementById('error-msg');
+      const roll    = document.getElementById('student-roll').value.trim().toUpperCase();
+      const day     = document.getElementById('dob-day').value;
+      const month   = document.getElementById('dob-month').value;
+      const year    = document.getElementById('dob-year').value;
+
+      if (!day || !month || !year) {
+        errorEl.textContent = '❌ Please select your complete date of birth.';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      const dob = `${year}-${month}-${day}`;
+
+      btn.disabled  = true;
+      btn.innerHTML = '<span class="spinner"></span>Verifying…';
+      errorEl.classList.remove('show');
+
+      setTimeout(() => {
+        // Read students from localStorage (seeded by db.js)
+        const students = JSON.parse(localStorage.getItem('cfms_students') || '[]');
+        const student  = students.find(s =>
+          s.rollNo.toUpperCase() === roll && s.dob === dob
+        );
+
+        if (student) {
+          sessionStorage.setItem('cfms_auth', JSON.stringify({
+            username: student.rollNo, display: student.name,
+            role: 'student', studentId: student.id,
+            loginAt: new Date().toISOString(),
+          }));
+          window.location.replace('student-portal.html');
+        } else {
+          errorEl.textContent = '❌ Roll number or date of birth is incorrect. Please try again.';
+          errorEl.classList.add('show');
+          btn.disabled  = false;
+          btn.innerHTML = 'Login as Student';
+        }
+      }, 600);
     }
 
     function togglePassword() {
-      const input = document.getElementById('password');
+      const input = document.getElementById('admin-password');
       const btn   = document.getElementById('toggle-pw-btn');
-      if (input.type === 'password') {
-        input.type  = 'text';
-        btn.textContent = '🙈';
-      } else {
-        input.type  = 'password';
-        btn.textContent = '👁';
-      }
+      input.type  = input.type === 'password' ? 'text' : 'password';
+      btn.textContent = input.type === 'password' ? '👁' : '🙈';
     }
   </script>
-
 </body>
 </html>

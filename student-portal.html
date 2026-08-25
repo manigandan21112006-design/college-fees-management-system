@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Portal — Shanmuga Industries Arts and Science College</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* ── Top header band ── */
+    .top-header {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+    .top-header .logo { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .top-header .logo span { font-size: .75rem; opacity: .8; font-weight: 400; display: block; }
+    .btn-logout {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,.25); }
+
+    /* ── Profile banner ── */
+    .profile-banner {
+      background: linear-gradient(120deg, #1d4ed8 0%, #1e40af 50%, #475569 100%);
+      color: #fff;
+      padding: 28px 24px 24px;
+    }
+    .profile-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .avatar-circle {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      border: 3px solid rgba(255,255,255,.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      flex-shrink: 0;
+    }
+    .profile-info h2 { font-size: 1.4rem; font-weight: 800; }
+    .profile-info .roll { font-size: .85rem; opacity: .85; margin-top: 3px; }
+    .profile-info .course-tag {
+      display: inline-block;
+      margin-top: 8px;
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    /* ── Main content ── */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-header h3 { font-size: 1rem; font-weight: 700; color: #1e293b; }
+    .card-body { padding: 20px; }
+
+    /* ── Info grid ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .info-item .label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    .info-item .value {
+      font-size: .92rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    /* ── Fee summary boxes ── */
+    .fee-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .fee-box {
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .fee-box .amount { font-size: 1.25rem; font-weight: 800; }
+    .fee-box .label  { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
+    .fee-box.blue   { background: #eff6ff; color: #1d4ed8; }
+    .fee-box.green  { background: #f0fdf4; color: #16a34a; }
+    .fee-box.red    { background: #fef2f2; color: #dc2626; }
+    .fee-box.orange { background: #fff7ed; color: #d97706; }
+
+    /* ── Payment history table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    thead tr { background: #f8fafc; }
+    th { padding: 10px 14px; text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; color: #64748b; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Status badge ── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .badge-paid    { background: #dcfce7; color: #16a34a; }
+    .badge-partial { background: #fef3c7; color: #d97706; }
+    .badge-pending { background: #fee2e2; color: #dc2626; }
+
+    /* ── Progress bar ── */
+    .progress-wrap { margin: 16px 0 8px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: .8rem; color: #64748b; margin-bottom: 6px; }
+    .progress-bar-bg { background: #e2e8f0; border-radius: 99px; height: 10px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #16a34a, #22c55e); transition: width .6s ease; }
+
+    /* ── Print btn ── */
+    .btn-print {
+      background: #1d4ed8;
+      color: #fff;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-print:hover { opacity: .88; }
+
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 36px; color: #94a3b8; }
+    .empty .icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── No data screen ── */
+    #no-data {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+    }
+
+    @media (max-width: 500px) {
+      .fee-summary { grid-template-columns: 1fr 1fr; }
+      .info-grid   { grid-template-columns: 1fr; }
+      .profile-inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top nav -->
+  <div class="top-header">
+    <div class="logo">
+      🎓
+      <div>
+        Shanmuga Industries Arts and Science College
+        <span>Student Fee Portal</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="logout()">⬅ Logout</button>
+  </div>
+
+  <!-- Profile banner -->
+  <div class="profile-banner">
+    <div class="profile-inner">
+      <div class="avatar-circle" id="avatar-initials">?</div>
+      <div class="profile-info">
+        <h2 id="student-name">Loading…</h2>
+        <div class="roll" id="student-roll"></div>
+        <div class="course-tag" id="student-course-tag"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="content">
+
+    <!-- Fee summary -->
+    <div class="fee-summary" id="fee-summary">
+      <div class="fee-box blue">
+        <div class="amount" id="sum-total">₹0</div>
+        <div class="label">Total Fee</div>
+      </div>
+      <div class="fee-box green">
+        <div class="amount" id="sum-paid">₹0</div>
+        <div class="label">Paid</div>
+      </div>
+      <div class="fee-box red" id="balance-box">
+        <div class="amount" id="sum-balance">₹0</div>
+        <div class="label">Balance</div>
+      </div>
+    </div>
+
+    <!-- Payment progress -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Payment Progress</h3>
+        <span id="progress-pct" style="font-weight:800;color:#16a34a">0%</span>
+      </div>
+      <div class="card-body">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Amount Paid</span>
+            <span id="progress-label-detail"></span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student details -->
+    <div class="card">
+      <div class="card-header"><h3>My Details</h3></div>
+      <div class="card-body">
+        <div class="info-grid" id="student-info-grid"></div>
+      </div>
+    </div>
+
+    <!-- Payment history -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Payment History</h3>
+      </div>
+      <div id="payment-history-wrap">
+        <div class="empty">
+          <div class="icon">💳</div>
+          <p>No payment records found.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <script>
+    // ── Auth guard ──────────────────────────────────────────
+    const authRaw = sessionStorage.getItem('cfms_auth');
+    if (!authRaw) { window.location.replace('login.html'); }
+
+    const auth = JSON.parse(authRaw);
+    if (auth.role !== 'student') { window.location.replace('index.html'); }
+
+    function logout() {
+      sessionStorage.removeItem('cfms_auth');
+      window.location.replace('login.html');
+    }
+
+    // ── Helpers ─────────────────────────────────────────────
+    function fmtCurrency(n) {
+      if (!n && n !== 0) return '—';
+      return '₹' + Number(n).toLocaleString('en-IN');
+    }
+    function fmtDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    }
+    function initials(name) {
+      return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    }
+
+    // ── Load data ───────────────────────────────────────────
+    const students       = JSON.parse(localStorage.getItem('cfms_students')       || '[]');
+    const courses        = JSON.parse(localStorage.getItem('cfms_courses')        || '[]');
+    const payments       = JSON.parse(localStorage.getItem('cfms_payments')       || '[]');
+    const feeStructures  = JSON.parse(localStorage.getItem('cfms_fee_structures') || '[]');
+
+    // If nothing seeded yet, seed defaults then reload
+    if (!students.length) {
+      // Dynamically load db.js to trigger seed, then reload
+      const s = document.createElement('script');
+      s.src = 'public/js/db.js';
+      s.onload = () => { DB.seed(); location.reload(); };
+      document.head.appendChild(s);
+    } else {
+      renderPortal();
+    }
+
+    function renderPortal() {
+      const student = students.find(s => s.id === auth.studentId);
+      if (!student) {
+        document.querySelector('.content').innerHTML =
+          '<div style="text-align:center;padding:60px;color:#94a3b8"><div style="font-size:3rem">😕</div><p style="margin-top:12px">Student record not found. Please contact admin.</p></div>';
+        return;
+      }
+
+      const course = courses.find(c => c.id === student.courseId);
+
+      // ── Profile banner ──
+      document.getElementById('avatar-initials').textContent = initials(student.name);
+      document.getElementById('student-name').textContent    = student.name;
+      document.getElementById('student-roll').textContent    = student.rollNo + ' · ' + (student.gender || '') + ' · ' + (student.status || '');
+      document.getElementById('student-course-tag').textContent =
+        (course ? course.name : '—') + ' · Year ' + student.year;
+
+      // ── Student info grid ──
+      document.getElementById('student-info-grid').innerHTML = `
+        <div class="info-item"><div class="label">Roll Number</div><div class="value">${student.rollNo}</div></div>
+        <div class="info-item"><div class="label">Full Name</div><div class="value">${student.name}</div></div>
+        <div class="info-item"><div class="label">Course</div><div class="value">${course ? course.name : '—'}</div></div>
+        <div class="info-item"><div class="label">Year</div><div class="value">Year ${student.year}</div></div>
+        <div class="info-item"><div class="label">Email</div><div class="value">${student.email || '—'}</div></div>
+        <div class="info-item"><div class="label">Phone</div><div class="value">${student.phone || '—'}</div></div>
+        <div class="info-item"><div class="label">Date of Birth</div><div class="value">${fmtDate(student.dob)}</div></div>
+        <div class="info-item"><div class="label">Admission Date</div><div class="value">${fmtDate(student.admissionDate)}</div></div>
+        <div class="info-item"><div class="label">Address</div><div class="value">${student.address || '—'}</div></div>
+        <div class="info-item"><div class="label">Status</div><div class="value">${student.status || '—'}</div></div>
+      `;
+
+      // ── Payments for this student ──
+      const myPayments = payments.filter(p => p.studentId === student.id);
+
+      const totalFee  = myPayments.reduce((s, p) => s + (p.amount || 0), 0);
+      const totalPaid = myPayments.reduce((s, p) => s + (p.paidAmount || 0), 0);
+      const balance   = totalFee - totalPaid;
+      const pct       = totalFee > 0 ? Math.round((totalPaid / totalFee) * 100) : 0;
+
+      // Fee summary
+      document.getElementById('sum-total').textContent   = fmtCurrency(totalFee);
+      document.getElementById('sum-paid').textContent    = fmtCurrency(totalPaid);
+      document.getElementById('sum-balance').textContent = fmtCurrency(balance);
+
+      // Progress
+      document.getElementById('progress-pct').textContent          = pct + '%';
+      document.getElementById('progress-fill').style.width         = pct + '%';
+      document.getElementById('progress-label-detail').textContent = fmtCurrency(totalPaid) + ' of ' + fmtCurrency(totalFee);
+
+      // Change balance box color if fully paid
+      if (balance === 0 && totalFee > 0) {
+        document.getElementById('balance-box').className = 'fee-box green';
+      }
+
+      // ── Payment history table ──
+      const wrap = document.getElementById('payment-history-wrap');
+      if (!myPayments.length) return; // keeps the empty state
+
+      wrap.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Receipt</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Fee</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Print</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${myPayments.map(p => {
+                const bal = p.amount - p.paidAmount;
+                const badgeCls = p.status === 'Paid' ? 'badge-paid' : p.status === 'Partial' ? 'badge-partial' : 'badge-pending';
+                return `<tr>
+                  <td style="font-weight:700">${p.receiptNo || '—'}</td>
+                  <td>${fmtDate(p.paymentDate)}</td>
+                  <td>${p.method || '—'}</td>
+                  <td>${fmtCurrency(p.amount)}</td>
+                  <td style="color:#16a34a;font-weight:700">${fmtCurrency(p.paidAmount)}</td>
+                  <td style="color:${bal > 0 ? '#dc2626' : '#16a34a'};font-weight:700">${fmtCurrency(bal)}</td>
+                  <td><span class="badge ${badgeCls}">${p.status}</span></td>
+                  <td><button class="btn-print" onclick="printReceipt(${p.id})">🖨️</button></td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // ── Print receipt ────────────────────────────────────────
+    function printReceipt(paymentId) {
+      const p = payments.find(x => x.id === paymentId);
+      if (!p) return;
+      const s  = students.find(x => x.id === p.studentId);
+      const c  = s ? courses.find(x => x.id === s.courseId) : null;
+      const bal = p.amount - p.paidAmount;
+
+      const statusColor = p.status === 'Paid' ? '#16a34a' : p.status === 'Partial' ? '#d97706' : '#dc2626';
+      const statusBg    = p.status === 'Paid' ? '#dcfce7' : p.status === 'Partial' ? '#fef3c7' : '#fee2e2';
+
+      const win = window.open('', '_blank', 'width=680,height=800');
+      win.document.write(`<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"/>
+<title>Fee Receipt — ${p.receiptNo || 'N/A'}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;display:flex;justify-content:center;padding:30px 16px;color:#1e293b}
+  .receipt{background:#fff;width:600px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.1);overflow:hidden}
+  .rh{background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 60%,#3b82f6 100%);color:#fff;padding:28px 32px 20px;position:relative}
+  .rh .cn{font-size:1.15rem;font-weight:700}
+  .rh .cs{font-size:.8rem;opacity:.85;margin-top:2px}
+  .rh .rn{position:absolute;top:28px;right:32px;text-align:right}
+  .rh .rn span{display:block;font-size:.7rem;opacity:.75;text-transform:uppercase;letter-spacing:.8px}
+  .rh .rn strong{font-size:1.05rem}
+  .sr{background:${statusBg};color:${statusColor};text-align:center;font-size:.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px;border-bottom:1px solid ${statusColor}33}
+  .rb{padding:28px 32px}
+  .st{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;font-weight:600;margin-bottom:10px}
+  .ig{display:grid;grid-template-columns:1fr 1fr;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:22px}
+  .ic{padding:11px 14px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0}
+  .ic:nth-child(even){border-right:none}
+  .ic:nth-last-child(-n+2){border-bottom:none}
+  .ic .l{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+  .ic .v{font-size:.88rem;font-weight:600}
+  .ft{width:100%;border-collapse:collapse;margin-bottom:22px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
+  .ft thead tr{background:#f8fafc}
+  .ft th{padding:9px 14px;font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:#64748b;text-align:left;border-bottom:1px solid #e2e8f0}
+  .ft th:last-child,.ft td:last-child{text-align:right}
+  .ft td{padding:10px 14px;font-size:.88rem;color:#334155;border-bottom:1px solid #f1f5f9}
+  .ft tr:last-child td{border-bottom:none}
+  .ft .tr td{background:#eff6ff;font-weight:700;font-size:.95rem;color:#1d4ed8;border-top:2px solid #bfdbfe}
+  .ft .br td{font-weight:700;color:${bal > 0 ? '#dc2626' : '#16a34a'}}
+  .ss{display:flex;justify-content:space-between;padding:0 8px;margin-bottom:28px}
+  .sb{text-align:center;width:30%}
+  .sl{border-top:1px solid #cbd5e1;margin-bottom:6px;margin-top:44px}
+  .sb span{font-size:.72rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px}
+  .rf{background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;padding:12px;font-size:.72rem;color:#94a3b8}
+  @media print{body{background:#fff;padding:0}.receipt{box-shadow:none;border-radius:0;width:100%}}
+</style></head><body>
+<div class="receipt">
+  <div class="rh">
+    <div class="cn">🎓 Shanmuga Industries Arts and Science College</div>
+    <div class="cs">Official Fee Payment Receipt</div>
+    <div class="rn"><span>Receipt No.</span><strong>${p.receiptNo || '—'}</strong></div>
+  </div>
+  <div class="sr">Payment Status: ${p.status || '—'}</div>
+  <div class="rb">
+    <div class="st">Student Information</div>
+    <div class="ig">
+      <div class="ic"><div class="l">Student Name</div><div class="v">${s ? s.name : '—'}</div></div>
+      <div class="ic"><div class="l">Roll Number</div><div class="v">${s ? s.rollNo : '—'}</div></div>
+      <div class="ic"><div class="l">Course</div><div class="v">${c ? c.name : '—'}</div></div>
+      <div class="ic"><div class="l">Year of Study</div><div class="v">${s ? 'Year ' + s.year : '—'}</div></div>
+      <div class="ic"><div class="l">Payment Date</div><div class="v">${p.paymentDate ? new Date(p.paymentDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</div></div>
+      <div class="ic"><div class="l">Payment Method</div><div class="v">${p.method || '—'}</div></div>
+    </div>
+    <div class="st">Fee Details</div>
+    <table class="ft">
+      <thead><tr><th>Description</th><th>Amount</th></tr></thead>
+      <tbody>
+        <tr><td>Total Fee Amount</td><td>₹${Number(p.amount).toLocaleString('en-IN')}</td></tr>
+        <tr class="tr"><td>Amount Paid</td><td>₹${Number(p.paidAmount).toLocaleString('en-IN')}</td></tr>
+        <tr class="br"><td>Balance Due</td><td>₹${Number(bal).toLocaleString('en-IN')}</td></tr>
+      </tbody>
+    </table>
+    ${p.remark ? `<div class="st">Remarks</div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:11px 14px;font-size:.83rem;color:#475569;margin-bottom:22px">${p.remark}</div>` : ''}
+    <div class="ss">
+      <div class="sb"><div class="sl"></div><span>Student Signature</span></div>
+      <div class="sb"><div class="sl"></div><span>Accounts Officer</span></div>
+      <div class="sb"><div class="sl"></div><span>Principal</span></div>
+    </div>
+  </div>
+  <div class="rf">This is a computer-generated receipt. Generated on ${new Date().toLocaleString('en-IN')}</div>
+</div>
+<script>window.onload=()=>{window.print()}<\/script>
+</body></html>`);
+      win.document.close();
+    }
+  </script>
+
+  <!-- Load db.js to ensure seed data exists -->
+  <script src="public/js/db.js"></script>
+  <script>
+    DB.seed();
+    // If portal rendered before seed, re-render now
+    if (!document.getElementById('student-info-grid').innerHTML.trim()) {
+      const students2      = JSON.parse(localStorage.getItem('cfms_students')       || '[]');
+      const courses2       = JSON.parse(localStorage.getItem('cfms_courses')        || '[]');
+      const payments2      = JSON.parse(localStorage.getItem('cfms_payments')       || '[]');
+      if (students2.length) location.reload();
+    }
+  </script>
+
+</body>
+</html>

@@ -567,8 +567,15 @@
 <!-- ══════════════════ SCRIPTS ══════════════════ -->
 <script>
   // Auth guard — redirect to login if not logged in
-  if (!sessionStorage.getItem('cfms_auth')) {
+  const _auth = sessionStorage.getItem('cfms_auth');
+  if (!_auth) {
     window.location.replace('login.html');
+  } else {
+    const _a = JSON.parse(_auth);
+    // Students should not access the admin panel
+    if (_a.role === 'student') {
+      window.location.replace('student-portal.html');
+    }
   }
   function logout() {
     sessionStorage.removeItem('cfms_auth');

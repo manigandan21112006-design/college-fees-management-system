@@ -41,12 +41,10 @@ function renderStudents() {
           <div style="width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0">
             ${s.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}
           </div>
-          <div>
-            <div style="font-weight:600">${s.name}</div>
-            <div class="text-muted" style="font-size:.75rem">${s.rollNo}</div>
-          </div>
+          <div style="font-weight:600">${s.name}</div>
         </div>
       </td>
+      <td><span class="badge badge-secondary" style="font-size:.8rem;font-weight:700;letter-spacing:.3px">${s.rollNo}</span></td>
       <td>${course ? course.name : '—'}<br><small class="text-muted">Year ${s.year}</small></td>
       <td>${s.email}<br><small class="text-muted">${s.phone}</small></td>
       <td>${fmtDate(s.admissionDate)}</td>

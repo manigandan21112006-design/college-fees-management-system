@@ -96,8 +96,26 @@ function confirmAction(msg) {
 }
 
 // ── Init ─────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  DB.seed();
+document.addEventListener('DOMContentLoaded', async () => {
+
+  // Show loading overlay while data fetches from Supabase
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="db-loading" style="position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+      <div style="width:44px;height:44px;border:4px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite"></div>
+      <p style="color:#475569;font-size:.95rem;font-weight:600">Loading data…</p>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>`);
+
+  const ok = await DB.load();
+
+  document.getElementById('db-loading').remove();
+
+  if (!ok) {
+    document.body.insertAdjacentHTML('beforeend', `
+      <div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fee2e2;color:#991b1b;padding:12px 24px;border-radius:10px;font-weight:600;font-size:.9rem;box-shadow:0 4px 12px rgba(0,0,0,.1)">
+        ⚠️ Could not connect to database. Check your internet connection.
+      </div>`);
+  }
 
   // nav links
   document.querySelectorAll('.nav-link[data-page]').forEach(link => {

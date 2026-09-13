@@ -108,7 +108,7 @@ function openEditStudent(id) {
   openModal('student-modal');
 }
 
-function saveStudent() {
+async function saveStudent() {
   const data = {
     name:          document.getElementById('student-name').value.trim(),
     rollNo:        document.getElementById('student-roll').value.trim(),
@@ -128,16 +128,19 @@ function saveStudent() {
     return;
   }
 
-  if (editStudentId) {
-    DB.Students.update(editStudentId, data);
-    toast('Student updated successfully!', 'success');
-  } else {
-    DB.Students.add(data);
-    toast('Student added successfully!', 'success');
+  try {
+    if (editStudentId) {
+      await DB.Students.update(editStudentId, data);
+      toast('Student updated successfully!', 'success');
+    } else {
+      await DB.Students.add(data);
+      toast('Student added successfully!', 'success');
+    }
+    closeModal('student-modal');
+    renderStudents();
+  } catch(e) {
+    toast('Error saving student: ' + e.message, 'error');
   }
-
-  closeModal('student-modal');
-  renderStudents();
 }
 
 // ── View student detail ──────────────────────────────────────
@@ -187,13 +190,14 @@ function openViewStudent(id) {
   openModal('view-student-modal');
 }
 
-// ── Delete ───────────────────────────────────────────────────
-function deleteStudent(id) {
-  if (!confirmAction('Are you sure you want to delete this student? All related payments will also be removed.')) return;
-  DB.Students.delete(id);
-  DB.Payments.all().filter(p => p.studentId === id).forEach(p => DB.Payments.delete(p.id));
-  toast('Student deleted.', 'info');
-  renderStudents();
+async function deleteStudent(id) {
+  if (!confirmAction('Are you sure you want to delete this student?')) return;
+  try {
+    await DB.Students.delete(id);
+    for (const p of DB.Payments.byStudent(id)) await DB.Payments.delete(p.id);
+    toast('Student deleted.', 'info');
+    renderStudents();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // ── Search ───────────────────────────────────────────────────

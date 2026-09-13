@@ -82,33 +82,27 @@ function openEditCourse(id) {
   openModal('course-modal');
 }
 
-function saveCourse() {
+async function saveCourse() {
   const data = {
     name:       document.getElementById('course-name').value.trim(),
     department: document.getElementById('course-dept').value.trim(),
     duration:   parseInt(document.getElementById('course-duration').value),
   };
-  if (!data.name || !data.department || !data.duration) {
-    toast('Please fill all fields.', 'error');
-    return;
-  }
-  if (editCourseId) {
-    DB.Courses.update(editCourseId, data);
-    toast('Course updated!', 'success');
-  } else {
-    DB.Courses.add(data);
-    toast('Course added!', 'success');
-  }
-  closeModal('course-modal');
-  renderFees();
+  if (!data.name || !data.department || !data.duration) { toast('Please fill all fields.', 'error'); return; }
+  try {
+    if (editCourseId) { await DB.Courses.update(editCourseId, data); toast('Course updated!', 'success'); }
+    else              { await DB.Courses.add(data);                  toast('Course added!', 'success');   }
+    closeModal('course-modal'); renderFees();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function deleteCourse(id) {
-  if (!confirmAction('Delete this course? All fee structures for it will also be removed.')) return;
-  DB.Courses.delete(id);
-  DB.FeeStructures.all().filter(f => f.courseId === id).forEach(f => DB.FeeStructures.delete(f.id));
-  toast('Course deleted.', 'info');
-  renderFees();
+async function deleteCourse(id) {
+  if (!confirmAction('Delete this course?')) return;
+  try {
+    await DB.Courses.delete(id);
+    for (const f of DB.FeeStructures.byCourse(id)) await DB.FeeStructures.delete(f.id);
+    toast('Course deleted.', 'info'); renderFees();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // ── Fee Structure CRUD ───────────────────────────────────────
@@ -155,36 +149,26 @@ function calcFeeTotal() {
   if (el) el.textContent = fmtCurrency(total);
 }
 
-function saveFeeStructure() {
+async function saveFeeStructure() {
   const data = {
-    courseId:   parseInt(document.getElementById('fee-course').value),
-    year:       parseInt(document.getElementById('fee-year').value),
-    tuitionFee: parseFloat(document.getElementById('fee-tuition').value) || 0,
-    examFee:    parseFloat(document.getElementById('fee-exam').value) || 0,
-    libraryFee: parseFloat(document.getElementById('fee-library').value) || 0,
-    labFee:     parseFloat(document.getElementById('fee-lab').value) || 0,
-    otherFee:   parseFloat(document.getElementById('fee-other').value) || 0,
+    courseId: parseInt(document.getElementById('fee-course').value), year: parseInt(document.getElementById('fee-year').value),
+    tuitionFee: parseFloat(document.getElementById('fee-tuition').value)||0, examFee: parseFloat(document.getElementById('fee-exam').value)||0,
+    libraryFee: parseFloat(document.getElementById('fee-library').value)||0, labFee: parseFloat(document.getElementById('fee-lab').value)||0,
+    otherFee:   parseFloat(document.getElementById('fee-other').value)||0,
   };
-  if (!data.courseId || !data.year) {
-    toast('Please select a course and year.', 'error');
-    return;
-  }
-  if (editFeeId) {
-    DB.FeeStructures.update(editFeeId, data);
-    toast('Fee structure updated!', 'success');
-  } else {
-    DB.FeeStructures.add(data);
-    toast('Fee structure added!', 'success');
-  }
-  closeModal('fee-modal');
-  renderFees();
+  data.total = data.tuitionFee + data.examFee + data.libraryFee + data.labFee + data.otherFee;
+  if (!data.courseId || !data.year) { toast('Please select a course and year.', 'error'); return; }
+  try {
+    if (editFeeId) { await DB.FeeStructures.update(editFeeId, data); toast('Fee structure updated!', 'success'); }
+    else           { await DB.FeeStructures.add(data);               toast('Fee structure added!', 'success');   }
+    closeModal('fee-modal'); renderFees();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function deleteFee(id) {
+async function deleteFee(id) {
   if (!confirmAction('Delete this fee structure?')) return;
-  DB.FeeStructures.delete(id);
-  toast('Fee structure deleted.', 'info');
-  renderFees();
+  try { await DB.FeeStructures.delete(id); toast('Fee structure deleted.', 'info'); renderFees(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // live total recalc

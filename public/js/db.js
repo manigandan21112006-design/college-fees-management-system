@@ -1,442 +1,250 @@
 // ============================================================
-//  College Fees Management System — localStorage Data Layer
+//  College Fees Management System — Supabase Data Layer
+//  All render functions call DB.X.all() / get() / add() etc.
+//  This file keeps the same interface but stores data in
+//  Supabase PostgreSQL instead of localStorage.
 // ============================================================
 
-const DB = (() => {
-  const KEYS = {
-    students: 'cfms_students',
-    feeStructures: 'cfms_fee_structures',
-    payments: 'cfms_payments',
-    courses: 'cfms_courses',
-    courseSubjects: 'cfms_course_subjects',
-    attendance: 'cfms_attendance',
-    timetable: 'cfms_timetable',
-    examResults: 'cfms_exam_results',
-  };
+const SUPA_URL = 'https://sbbmcosqxjngmqnpgucw.supabase.co';
+const SUPA_KEY = 'sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B';
 
-  // ── helpers ──────────────────────────────────────────────
-  const load = (key) => JSON.parse(localStorage.getItem(key) || '[]');
-  const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-  const nextId = (arr) => arr.length ? Math.max(...arr.map(i => i.id)) + 1 : 1;
-
-  // ── seed ─────────────────────────────────────────────────
-  function seed() {
-    // v2 forces re-seed to add new collections (attendance, timetable, exam results, subjects)
-    if (localStorage.getItem('cfms_seeded') === 'v2') return;
-    // Clear old seed flag and all data so new seed runs fresh
-    localStorage.removeItem('cfms_seeded');
-    localStorage.removeItem('cfms_course_subjects');
-    localStorage.removeItem('cfms_timetable');
-    localStorage.removeItem('cfms_attendance');
-    localStorage.removeItem('cfms_exam_results');
-
-    const courses = [
-      { id: 1, name: 'B.Tech Computer Science', duration: 4, department: 'Engineering' },
-      { id: 2, name: 'B.Tech Electronics',       duration: 4, department: 'Engineering' },
-      { id: 3, name: 'BBA',                       duration: 3, department: 'Management' },
-      { id: 4, name: 'B.Sc Physics',              duration: 3, department: 'Science'    },
-      { id: 5, name: 'B.Com',                     duration: 3, department: 'Commerce'   },
-    ];
-
-    const feeStructures = [
-      { id: 1, courseId: 1, year: 1, tuitionFee: 85000, examFee: 2500, libraryFee: 1500, labFee: 5000, otherFee: 2000, total: 96000  },
-      { id: 2, courseId: 1, year: 2, tuitionFee: 85000, examFee: 2500, libraryFee: 1500, labFee: 5000, otherFee: 2000, total: 96000  },
-      { id: 3, courseId: 1, year: 3, tuitionFee: 90000, examFee: 2500, libraryFee: 1500, labFee: 6000, otherFee: 2000, total: 102000 },
-      { id: 4, courseId: 1, year: 4, tuitionFee: 90000, examFee: 2500, libraryFee: 1500, labFee: 6000, otherFee: 2000, total: 102000 },
-      { id: 5, courseId: 2, year: 1, tuitionFee: 80000, examFee: 2500, libraryFee: 1500, labFee: 4500, otherFee: 2000, total: 90500  },
-      { id: 6, courseId: 3, year: 1, tuitionFee: 55000, examFee: 2000, libraryFee: 1000, labFee: 0,    otherFee: 1500, total: 59500  },
-      { id: 7, courseId: 4, year: 1, tuitionFee: 45000, examFee: 2000, libraryFee: 1000, labFee: 3000, otherFee: 1000, total: 52000  },
-      { id: 8, courseId: 5, year: 1, tuitionFee: 40000, examFee: 2000, libraryFee: 1000, labFee: 0,    otherFee: 1000, total: 44000  },
-    ];
-
-    const students = [
-      { id: 1,  rollNo: 'CS2301', name: 'Aarav Sharma',    email: 'aarav@college.edu',    phone: '9876543210', courseId: 1, year: 1, dob: '2005-03-12', gender: 'Male',   address: 'Mumbai', status: 'Active',   admissionDate: '2023-07-15' },
-      { id: 2,  rollNo: 'CS2302', name: 'Priya Patel',     email: 'priya@college.edu',    phone: '9876543211', courseId: 1, year: 1, dob: '2005-06-22', gender: 'Female', address: 'Delhi',  status: 'Active',   admissionDate: '2023-07-15' },
-      { id: 3,  rollNo: 'CS2201', name: 'Rohan Mehta',     email: 'rohan@college.edu',    phone: '9876543212', courseId: 1, year: 2, dob: '2004-01-30', gender: 'Male',   address: 'Pune',   status: 'Active',   admissionDate: '2022-07-10' },
-      { id: 4,  rollNo: 'CS2202', name: 'Sneha Gupta',     email: 'sneha@college.edu',    phone: '9876543213', courseId: 1, year: 2, dob: '2004-09-14', gender: 'Female', address: 'Surat',  status: 'Active',   admissionDate: '2022-07-10' },
-      { id: 5,  rollNo: 'EC2301', name: 'Karan Singh',     email: 'karan@college.edu',    phone: '9876543214', courseId: 2, year: 1, dob: '2005-11-05', gender: 'Male',   address: 'Jaipur', status: 'Active',   admissionDate: '2023-07-15' },
-      { id: 6,  rollNo: 'BBA2301',name: 'Anjali Verma',    email: 'anjali@college.edu',   phone: '9876543215', courseId: 3, year: 1, dob: '2005-02-18', gender: 'Female', address: 'Indore', status: 'Active',   admissionDate: '2023-07-20' },
-      { id: 7,  rollNo: 'PH2301', name: 'Vikram Nair',     email: 'vikram@college.edu',   phone: '9876543216', courseId: 4, year: 1, dob: '2005-07-25', gender: 'Male',   address: 'Kochi',  status: 'Active',   admissionDate: '2023-07-18' },
-      { id: 8,  rollNo: 'COM2301',name: 'Neha Joshi',      email: 'neha@college.edu',     phone: '9876543217', courseId: 5, year: 1, dob: '2005-04-09', gender: 'Female', address: 'Nagpur', status: 'Inactive', admissionDate: '2023-07-15' },
-      { id: 9,  rollNo: 'CS2101', name: 'Arjun Reddy',     email: 'arjun@college.edu',    phone: '9876543218', courseId: 1, year: 3, dob: '2003-12-01', gender: 'Male',   address: 'Hyd',    status: 'Active',   admissionDate: '2021-07-12' },
-      { id: 10, rollNo: 'CS2102', name: 'Deepika Rao',     email: 'deepika@college.edu',  phone: '9876543219', courseId: 1, year: 3, dob: '2003-08-17', gender: 'Female', address: 'Chennai',status: 'Active',   admissionDate: '2021-07-12' },
-    ];
-
-    const payments = [
-      { id: 1,  studentId: 1,  feeStructureId: 1,  amount: 96000, paidAmount: 96000, paymentDate: '2023-08-01', method: 'Online',  receiptNo: 'RCP001', status: 'Paid',    remark: ''           },
-      { id: 2,  studentId: 2,  feeStructureId: 1,  amount: 96000, paidAmount: 50000, paymentDate: '2023-08-05', method: 'Cash',    receiptNo: 'RCP002', status: 'Partial', remark: 'Instalment 1' },
-      { id: 3,  studentId: 3,  feeStructureId: 2,  amount: 96000, paidAmount: 96000, paymentDate: '2023-08-02', method: 'Cheque',  receiptNo: 'RCP003', status: 'Paid',    remark: ''           },
-      { id: 4,  studentId: 4,  feeStructureId: 2,  amount: 96000, paidAmount: 0,     paymentDate: '',           method: '',        receiptNo: '',       status: 'Pending', remark: ''           },
-      { id: 5,  studentId: 5,  feeStructureId: 5,  amount: 90500, paidAmount: 90500, paymentDate: '2023-08-03', method: 'Online',  receiptNo: 'RCP005', status: 'Paid',    remark: ''           },
-      { id: 6,  studentId: 6,  feeStructureId: 6,  amount: 59500, paidAmount: 30000, paymentDate: '2023-08-10', method: 'Cash',    receiptNo: 'RCP006', status: 'Partial', remark: 'Instalment 1' },
-      { id: 7,  studentId: 7,  feeStructureId: 7,  amount: 52000, paidAmount: 52000, paymentDate: '2023-08-07', method: 'Online',  receiptNo: 'RCP007', status: 'Paid',    remark: ''           },
-      { id: 8,  studentId: 9,  feeStructureId: 3,  amount: 102000,paidAmount: 102000,paymentDate: '2023-08-01', method: 'Online',  receiptNo: 'RCP008', status: 'Paid',    remark: ''           },
-      { id: 9,  studentId: 10, feeStructureId: 3,  amount: 102000,paidAmount: 75000, paymentDate: '2023-08-04', method: 'Cheque',  receiptNo: 'RCP009', status: 'Partial', remark: 'Balance due' },
-    ];
-
-    save(KEYS.courses, courses);
-    save(KEYS.feeStructures, feeStructures);
-    save(KEYS.students, students);
-    save(KEYS.payments, payments);
-
-    // ── Course Subjects ──────────────────────────────────────
-    // Each subject belongs to a course + year, has a code and name
-    const courseSubjects = [
-      // B.Tech CS Year 1 (courseId:1)
-      { id:1,  courseId:1, year:1, code:'CS101', name:'Engineering Mathematics I',   credits:4 },
-      { id:2,  courseId:1, year:1, code:'CS102', name:'Programming in C',            credits:4 },
-      { id:3,  courseId:1, year:1, code:'CS103', name:'Digital Logic Design',        credits:3 },
-      { id:4,  courseId:1, year:1, code:'CS104', name:'Engineering Physics',         credits:3 },
-      { id:5,  courseId:1, year:1, code:'CS105', name:'Communication Skills',        credits:2 },
-      // B.Tech CS Year 2 (courseId:1)
-      { id:6,  courseId:1, year:2, code:'CS201', name:'Data Structures',             credits:4 },
-      { id:7,  courseId:1, year:2, code:'CS202', name:'Computer Organisation',       credits:3 },
-      { id:8,  courseId:1, year:2, code:'CS203', name:'Discrete Mathematics',        credits:3 },
-      { id:9,  courseId:1, year:2, code:'CS204', name:'Object Oriented Programming', credits:4 },
-      { id:10, courseId:1, year:2, code:'CS205', name:'Database Management Systems', credits:4 },
-      // B.Tech CS Year 3 (courseId:1)
-      { id:11, courseId:1, year:3, code:'CS301', name:'Operating Systems',           credits:4 },
-      { id:12, courseId:1, year:3, code:'CS302', name:'Computer Networks',           credits:4 },
-      { id:13, courseId:1, year:3, code:'CS303', name:'Algorithm Design',            credits:3 },
-      // B.Tech Electronics Year 1 (courseId:2)
-      { id:14, courseId:2, year:1, code:'EC101', name:'Basic Electronics',           credits:4 },
-      { id:15, courseId:2, year:1, code:'EC102', name:'Circuit Theory',              credits:4 },
-      { id:16, courseId:2, year:1, code:'EC103', name:'Engineering Mathematics',     credits:3 },
-      { id:17, courseId:2, year:1, code:'EC104', name:'Electronic Devices',          credits:3 },
-      // BBA Year 1 (courseId:3)
-      { id:18, courseId:3, year:1, code:'BBA101', name:'Principles of Management',  credits:4 },
-      { id:19, courseId:3, year:1, code:'BBA102', name:'Business Communication',    credits:3 },
-      { id:20, courseId:3, year:1, code:'BBA103', name:'Financial Accounting',      credits:4 },
-      // B.Sc Physics Year 1 (courseId:4)
-      { id:21, courseId:4, year:1, code:'PH101',  name:'Mechanics',                 credits:4 },
-      { id:22, courseId:4, year:1, code:'PH102',  name:'Thermodynamics',            credits:3 },
-      { id:23, courseId:4, year:1, code:'PH103',  name:'Optics',                    credits:3 },
-      // B.Com Year 1 (courseId:5)
-      { id:24, courseId:5, year:1, code:'COM101', name:'Business Economics',        credits:3 },
-      { id:25, courseId:5, year:1, code:'COM102', name:'Accountancy',               credits:4 },
-    ];
-
-    // ── Timetable ────────────────────────────────────────────
-    // One timetable slot = courseId + year + day + period + subject code + room
-    const timetable = [
-      // B.Tech CS Year 1
-      { id:1,  courseId:1, year:1, day:'Monday',    period:'9:00 - 10:00',  subjectCode:'CS101', subjectName:'Engineering Mathematics I', room:'A101', faculty:'Dr. Ramesh' },
-      { id:2,  courseId:1, year:1, day:'Monday',    period:'10:00 - 11:00', subjectCode:'CS102', subjectName:'Programming in C',          room:'Lab1',  faculty:'Prof. Divya' },
-      { id:3,  courseId:1, year:1, day:'Monday',    period:'11:15 - 12:15', subjectCode:'CS103', subjectName:'Digital Logic Design',      room:'A102', faculty:'Dr. Suresh' },
-      { id:4,  courseId:1, year:1, day:'Tuesday',   period:'9:00 - 10:00',  subjectCode:'CS102', subjectName:'Programming in C',          room:'Lab1',  faculty:'Prof. Divya' },
-      { id:5,  courseId:1, year:1, day:'Tuesday',   period:'10:00 - 11:00', subjectCode:'CS104', subjectName:'Engineering Physics',       room:'A103', faculty:'Dr. Meera' },
-      { id:6,  courseId:1, year:1, day:'Wednesday', period:'9:00 - 10:00',  subjectCode:'CS103', subjectName:'Digital Logic Design',      room:'A102', faculty:'Dr. Suresh' },
-      { id:7,  courseId:1, year:1, day:'Wednesday', period:'10:00 - 11:00', subjectCode:'CS105', subjectName:'Communication Skills',      room:'A104', faculty:'Ms. Lakshmi' },
-      { id:8,  courseId:1, year:1, day:'Thursday',  period:'9:00 - 10:00',  subjectCode:'CS101', subjectName:'Engineering Mathematics I', room:'A101', faculty:'Dr. Ramesh' },
-      { id:9,  courseId:1, year:1, day:'Thursday',  period:'10:00 - 11:00', subjectCode:'CS104', subjectName:'Engineering Physics',       room:'A103', faculty:'Dr. Meera' },
-      { id:10, courseId:1, year:1, day:'Friday',    period:'9:00 - 10:00',  subjectCode:'CS102', subjectName:'Programming in C',          room:'Lab1',  faculty:'Prof. Divya' },
-      { id:11, courseId:1, year:1, day:'Friday',    period:'10:00 - 11:00', subjectCode:'CS101', subjectName:'Engineering Mathematics I', room:'A101', faculty:'Dr. Ramesh' },
-      // B.Tech CS Year 2
-      { id:12, courseId:1, year:2, day:'Monday',    period:'9:00 - 10:00',  subjectCode:'CS201', subjectName:'Data Structures',             room:'B101', faculty:'Prof. Kiran' },
-      { id:13, courseId:1, year:2, day:'Monday',    period:'10:00 - 11:00', subjectCode:'CS204', subjectName:'Object Oriented Programming', room:'Lab2',  faculty:'Dr. Anita' },
-      { id:14, courseId:1, year:2, day:'Tuesday',   period:'9:00 - 10:00',  subjectCode:'CS205', subjectName:'Database Management Systems', room:'B102', faculty:'Prof. Raja' },
-      { id:15, courseId:1, year:2, day:'Wednesday', period:'9:00 - 10:00',  subjectCode:'CS203', subjectName:'Discrete Mathematics',        room:'B103', faculty:'Dr. Priya' },
-      // B.Tech CS Year 3
-      { id:16, courseId:1, year:3, day:'Monday',    period:'9:00 - 10:00',  subjectCode:'CS301', subjectName:'Operating Systems',    room:'C101', faculty:'Dr. Venkat' },
-      { id:17, courseId:1, year:3, day:'Tuesday',   period:'9:00 - 10:00',  subjectCode:'CS302', subjectName:'Computer Networks',    room:'C102', faculty:'Prof. Sridhar' },
-      // B.Tech Electronics Year 1
-      { id:18, courseId:2, year:1, day:'Monday',    period:'9:00 - 10:00',  subjectCode:'EC101', subjectName:'Basic Electronics',    room:'D101', faculty:'Dr. Kumar' },
-      { id:19, courseId:2, year:1, day:'Tuesday',   period:'9:00 - 10:00',  subjectCode:'EC102', subjectName:'Circuit Theory',       room:'D102', faculty:'Prof. Nair' },
-      { id:20, courseId:2, year:1, day:'Wednesday', period:'9:00 - 10:00',  subjectCode:'EC103', subjectName:'Engineering Mathematics', room:'D103', faculty:'Dr. Smitha' },
-      // BBA Year 1
-      { id:21, courseId:3, year:1, day:'Monday',    period:'9:00 - 10:00',  subjectCode:'BBA101', subjectName:'Principles of Management', room:'E101', faculty:'Prof. Jain' },
-      { id:22, courseId:3, year:1, day:'Tuesday',   period:'9:00 - 10:00',  subjectCode:'BBA102', subjectName:'Business Communication',   room:'E102', faculty:'Ms. Sharma' },
-    ];
-
-    // ── Attendance ───────────────────────────────────────────
-    // Per student, per subject, per date
-    const attendance = [
-      // Aarav Sharma (id:1) CS2301 CS Year 1
-      { id:1,  studentId:1, subjectCode:'CS101', subjectName:'Engineering Mathematics I', date:'2023-08-07', status:'Present' },
-      { id:2,  studentId:1, subjectCode:'CS101', subjectName:'Engineering Mathematics I', date:'2023-08-10', status:'Present' },
-      { id:3,  studentId:1, subjectCode:'CS101', subjectName:'Engineering Mathematics I', date:'2023-08-14', status:'Absent'  },
-      { id:4,  studentId:1, subjectCode:'CS101', subjectName:'Engineering Mathematics I', date:'2023-08-17', status:'Present' },
-      { id:5,  studentId:1, subjectCode:'CS102', subjectName:'Programming in C',          date:'2023-08-07', status:'Present' },
-      { id:6,  studentId:1, subjectCode:'CS102', subjectName:'Programming in C',          date:'2023-08-08', status:'Present' },
-      { id:7,  studentId:1, subjectCode:'CS102', subjectName:'Programming in C',          date:'2023-08-10', status:'Absent'  },
-      { id:8,  studentId:1, subjectCode:'CS102', subjectName:'Programming in C',          date:'2023-08-15', status:'Present' },
-      { id:9,  studentId:1, subjectCode:'CS103', subjectName:'Digital Logic Design',      date:'2023-08-09', status:'Present' },
-      { id:10, studentId:1, subjectCode:'CS103', subjectName:'Digital Logic Design',      date:'2023-08-16', status:'Present' },
-      { id:11, studentId:1, subjectCode:'CS104', subjectName:'Engineering Physics',       date:'2023-08-08', status:'Present' },
-      { id:12, studentId:1, subjectCode:'CS104', subjectName:'Engineering Physics',       date:'2023-08-11', status:'Absent'  },
-      { id:13, studentId:1, subjectCode:'CS105', subjectName:'Communication Skills',      date:'2023-08-09', status:'Present' },
-      { id:14, studentId:1, subjectCode:'CS105', subjectName:'Communication Skills',      date:'2023-08-16', status:'Present' },
-      // Karan Singh (id:5) EC2301 Electronics Year 1
-      { id:15, studentId:5, subjectCode:'EC101', subjectName:'Basic Electronics',         date:'2023-08-07', status:'Present' },
-      { id:16, studentId:5, subjectCode:'EC101', subjectName:'Basic Electronics',         date:'2023-08-14', status:'Present' },
-      { id:17, studentId:5, subjectCode:'EC101', subjectName:'Basic Electronics',         date:'2023-08-21', status:'Absent'  },
-      { id:18, studentId:5, subjectCode:'EC102', subjectName:'Circuit Theory',            date:'2023-08-08', status:'Present' },
-      { id:19, studentId:5, subjectCode:'EC102', subjectName:'Circuit Theory',            date:'2023-08-15', status:'Present' },
-      { id:20, studentId:5, subjectCode:'EC103', subjectName:'Engineering Mathematics',   date:'2023-08-09', status:'Present' },
-      { id:21, studentId:5, subjectCode:'EC103', subjectName:'Engineering Mathematics',   date:'2023-08-16', status:'Present' },
-      { id:22, studentId:5, subjectCode:'EC104', subjectName:'Electronic Devices',        date:'2023-08-10', status:'Absent'  },
-      { id:23, studentId:5, subjectCode:'EC104', subjectName:'Electronic Devices',        date:'2023-08-17', status:'Present' },
-      // Rohan Mehta (id:3) CS Year 2
-      { id:24, studentId:3, subjectCode:'CS201', subjectName:'Data Structures',             date:'2023-08-07', status:'Present' },
-      { id:25, studentId:3, subjectCode:'CS201', subjectName:'Data Structures',             date:'2023-08-14', status:'Present' },
-      { id:26, studentId:3, subjectCode:'CS204', subjectName:'Object Oriented Programming', date:'2023-08-07', status:'Absent'  },
-      { id:27, studentId:3, subjectCode:'CS204', subjectName:'Object Oriented Programming', date:'2023-08-14', status:'Present' },
-      { id:28, studentId:3, subjectCode:'CS205', subjectName:'Database Management Systems', date:'2023-08-08', status:'Present' },
-      { id:29, studentId:3, subjectCode:'CS203', subjectName:'Discrete Mathematics',        date:'2023-08-09', status:'Present' },
-    ];
-
-    // ── Exam Results ─────────────────────────────────────────
-    // Per student, per subject, with CIE (internal) and SEE (semester end) marks
-    const examResults = [
-      // Aarav Sharma (id:1)
-      { id:1,  studentId:1, semester:'Sem 1', subjectCode:'CS101', subjectName:'Engineering Mathematics I', maxMarks:100, cieMarks:38, seeMarks:55, totalMarks:93,  grade:'A',  result:'Pass' },
-      { id:2,  studentId:1, semester:'Sem 1', subjectCode:'CS102', subjectName:'Programming in C',          maxMarks:100, cieMarks:40, seeMarks:52, totalMarks:92,  grade:'A',  result:'Pass' },
-      { id:3,  studentId:1, semester:'Sem 1', subjectCode:'CS103', subjectName:'Digital Logic Design',      maxMarks:100, cieMarks:35, seeMarks:48, totalMarks:83,  grade:'B',  result:'Pass' },
-      { id:4,  studentId:1, semester:'Sem 1', subjectCode:'CS104', subjectName:'Engineering Physics',       maxMarks:100, cieMarks:30, seeMarks:42, totalMarks:72,  grade:'C',  result:'Pass' },
-      { id:5,  studentId:1, semester:'Sem 1', subjectCode:'CS105', subjectName:'Communication Skills',      maxMarks:100, cieMarks:42, seeMarks:50, totalMarks:92,  grade:'A',  result:'Pass' },
-      // Karan Singh (id:5)
-      { id:6,  studentId:5, semester:'Sem 1', subjectCode:'EC101', subjectName:'Basic Electronics',         maxMarks:100, cieMarks:36, seeMarks:50, totalMarks:86,  grade:'A',  result:'Pass' },
-      { id:7,  studentId:5, semester:'Sem 1', subjectCode:'EC102', subjectName:'Circuit Theory',            maxMarks:100, cieMarks:33, seeMarks:44, totalMarks:77,  grade:'B',  result:'Pass' },
-      { id:8,  studentId:5, semester:'Sem 1', subjectCode:'EC103', subjectName:'Engineering Mathematics',   maxMarks:100, cieMarks:28, seeMarks:38, totalMarks:66,  grade:'C',  result:'Pass' },
-      { id:9,  studentId:5, semester:'Sem 1', subjectCode:'EC104', subjectName:'Electronic Devices',        maxMarks:100, cieMarks:40, seeMarks:56, totalMarks:96,  grade:'O',  result:'Pass' },
-      // Rohan Mehta (id:3) Sem 2 (year 2)
-      { id:10, studentId:3, semester:'Sem 3', subjectCode:'CS201', subjectName:'Data Structures',             maxMarks:100, cieMarks:39, seeMarks:54, totalMarks:93,  grade:'A',  result:'Pass' },
-      { id:11, studentId:3, semester:'Sem 3', subjectCode:'CS202', subjectName:'Computer Organisation',       maxMarks:100, cieMarks:31, seeMarks:40, totalMarks:71,  grade:'C',  result:'Pass' },
-      { id:12, studentId:3, semester:'Sem 3', subjectCode:'CS203', subjectName:'Discrete Mathematics',        maxMarks:100, cieMarks:25, seeMarks:30, totalMarks:55,  grade:'D',  result:'Pass' },
-      { id:13, studentId:3, semester:'Sem 3', subjectCode:'CS204', subjectName:'Object Oriented Programming', maxMarks:100, cieMarks:38, seeMarks:50, totalMarks:88,  grade:'A',  result:'Pass' },
-      // Priya Patel (id:2)
-      { id:14, studentId:2, semester:'Sem 1', subjectCode:'CS101', subjectName:'Engineering Mathematics I', maxMarks:100, cieMarks:35, seeMarks:46, totalMarks:81,  grade:'B',  result:'Pass' },
-      { id:15, studentId:2, semester:'Sem 1', subjectCode:'CS102', subjectName:'Programming in C',          maxMarks:100, cieMarks:42, seeMarks:55, totalMarks:97,  grade:'O',  result:'Pass' },
-      { id:16, studentId:2, semester:'Sem 1', subjectCode:'CS103', subjectName:'Digital Logic Design',      maxMarks:100, cieMarks:20, seeMarks:25, totalMarks:45,  grade:'F',  result:'Fail' },
-    ];
-
-    save(KEYS.courseSubjects, courseSubjects);
-    save(KEYS.timetable, timetable);
-    save(KEYS.attendance, attendance);
-    save(KEYS.examResults, examResults);
-    localStorage.setItem('cfms_seeded', 'v2');
+// ── Low-level fetch wrapper ───────────────────────────────────
+async function sbFetch(path, options = {}) {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      'apikey':        SUPA_KEY,
+      'Authorization': `Bearer ${SUPA_KEY}`,
+      'Content-Type':  'application/json',
+      'Prefer':        options.prefer || 'return=representation',
+      ...(options.headers || {}),
+    },
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('Supabase error:', res.status, err);
+    throw new Error(`DB error ${res.status}: ${err}`);
   }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
 
-  // ── COURSES ──────────────────────────────────────────────
-  const Courses = {
-    all: () => load(KEYS.courses),
-    get: (id) => load(KEYS.courses).find(c => c.id === id),
-    add: (data) => {
-      const arr = load(KEYS.courses);
-      const item = { ...data, id: nextId(arr) };
-      arr.push(item); save(KEYS.courses, arr); return item;
+// ── In-memory cache (keeps UI synchronous after initial load) ─
+const _cache = {
+  courses:         [],
+  feeStructures:   [],
+  students:        [],
+  payments:        [],
+  courseSubjects:  [],
+  timetable:       [],
+  attendance:      [],
+  examResults:     [],
+};
+
+// ── Map snake_case DB columns → camelCase JS ─────────────────
+function mapCourse(r)        { return { id: r.id, name: r.name, duration: r.duration, department: r.department }; }
+function mapFeeStructure(r)  { return { id: r.id, courseId: r.course_id, year: r.year, tuitionFee: r.tuition_fee, examFee: r.exam_fee, libraryFee: r.library_fee, labFee: r.lab_fee, otherFee: r.other_fee, total: r.total }; }
+function mapStudent(r)       { return { id: r.id, rollNo: r.roll_no, name: r.name, email: r.email||'', phone: r.phone||'', dob: r.dob||'', gender: r.gender||'', address: r.address||'', courseId: r.course_id, year: r.year, status: r.status, admissionDate: r.admission_date||'' }; }
+function mapPayment(r)       { return { id: r.id, studentId: r.student_id, feeStructureId: r.fee_structure_id, amount: r.amount, paidAmount: r.paid_amount, paymentDate: r.payment_date||'', method: r.method||'', receiptNo: r.receipt_no||'', status: r.status, remark: r.remark||'' }; }
+function mapSubject(r)       { return { id: r.id, courseId: r.course_id, year: r.year, code: r.code, name: r.name, credits: r.credits }; }
+function mapTimetable(r)     { return { id: r.id, courseId: r.course_id, year: r.year, day: r.day, period: r.period, subjectCode: r.subject_code, subjectName: r.subject_name, room: r.room||'', faculty: r.faculty||'' }; }
+function mapAttendance(r)    { return { id: r.id, studentId: r.student_id, subjectCode: r.subject_code, subjectName: r.subject_name, date: r.date, status: r.status }; }
+function mapExamResult(r)    { return { id: r.id, studentId: r.student_id, semester: r.semester, subjectCode: r.subject_code, subjectName: r.subject_name, maxMarks: r.max_marks, cieMarks: r.cie_marks, seeMarks: r.see_marks, totalMarks: r.total_marks, grade: r.grade||'', result: r.result||'' }; }
+
+// ── Map camelCase JS → snake_case DB ─────────────────────────
+function toDbCourse(d)       { return { name: d.name, duration: d.duration, department: d.department }; }
+function toDbFeeStructure(d) { return { course_id: d.courseId, year: d.year, tuition_fee: d.tuitionFee||0, exam_fee: d.examFee||0, library_fee: d.libraryFee||0, lab_fee: d.labFee||0, other_fee: d.otherFee||0, total: d.total||0 }; }
+function toDbStudent(d)      { return { roll_no: d.rollNo, name: d.name, email: d.email||null, phone: d.phone||null, dob: d.dob||null, gender: d.gender||null, address: d.address||null, course_id: d.courseId, year: d.year, status: d.status, admission_date: d.admissionDate||null }; }
+function toDbPayment(d)      { return { student_id: d.studentId, fee_structure_id: d.feeStructureId||null, amount: d.amount, paid_amount: d.paidAmount, payment_date: d.paymentDate||null, method: d.method||null, receipt_no: d.receiptNo||null, status: d.status, remark: d.remark||null }; }
+function toDbSubject(d)      { return { course_id: d.courseId, year: d.year, code: d.code, name: d.name, credits: d.credits||3 }; }
+function toDbTimetable(d)    { return { course_id: d.courseId, year: d.year, day: d.day, period: d.period, subject_code: d.subjectCode, subject_name: d.subjectName, room: d.room||null, faculty: d.faculty||null }; }
+function toDbAttendance(d)   { return { student_id: d.studentId, subject_code: d.subjectCode, subject_name: d.subjectName, date: d.date, status: d.status }; }
+function toDbExamResult(d)   { return { student_id: d.studentId, semester: d.semester, subject_code: d.subjectCode, subject_name: d.subjectName, max_marks: d.maxMarks||100, cie_marks: d.cieMarks||0, see_marks: d.seeMarks||0, total_marks: d.totalMarks||0, grade: d.grade||null, result: d.result||null }; }
+
+// ── Generic collection factory ────────────────────────────────
+function makeCollection(table, cacheKey, mapFn, toDbFn, extraMethods = {}) {
+  return {
+    // Synchronous reads from cache (use after DB.load())
+    all:    ()     => _cache[cacheKey],
+    get:    (id)   => _cache[cacheKey].find(r => r.id === id),
+
+    // Async writes — update DB then refresh cache
+    add: async (data) => {
+      const rows = await sbFetch(table, { method: 'POST', body: JSON.stringify(toDbFn(data)) });
+      const item = mapFn(rows[0]);
+      _cache[cacheKey].push(item);
+      return item;
     },
-    update: (id, data) => {
-      const arr = load(KEYS.courses).map(c => c.id === id ? { ...c, ...data } : c);
-      save(KEYS.courses, arr);
+    update: async (id, data) => {
+      await sbFetch(`${table}?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(toDbFn(data)) });
+      const idx = _cache[cacheKey].findIndex(r => r.id === id);
+      if (idx >= 0) _cache[cacheKey][idx] = { ..._cache[cacheKey][idx], ...data, id };
     },
-    delete: (id) => {
-      save(KEYS.courses, load(KEYS.courses).filter(c => c.id !== id));
+    delete: async (id) => {
+      await sbFetch(`${table}?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' } });
+      _cache[cacheKey] = _cache[cacheKey].filter(r => r.id !== id);
     },
+
+    // Async reload from DB into cache
+    reload: async () => {
+      const rows = await sbFetch(`${table}?order=id`);
+      _cache[cacheKey] = (rows || []).map(mapFn);
+    },
+
+    ...extraMethods,
   };
+}
 
-  // ── FEE STRUCTURES ───────────────────────────────────────
-  const FeeStructures = {
-    all: () => load(KEYS.feeStructures),
-    get: (id) => load(KEYS.feeStructures).find(f => f.id === id),
-    byCourse: (courseId) => load(KEYS.feeStructures).filter(f => f.courseId === courseId),
-    byCourseYear: (courseId, year) => load(KEYS.feeStructures).find(f => f.courseId === courseId && f.year === year),
-    add: (data) => {
-      const arr = load(KEYS.feeStructures);
-      const total = (data.tuitionFee||0)+(data.examFee||0)+(data.libraryFee||0)+(data.labFee||0)+(data.otherFee||0);
-      const item = { ...data, total, id: nextId(arr) };
-      arr.push(item); save(KEYS.feeStructures, arr); return item;
-    },
-    update: (id, data) => {
-      const total = (data.tuitionFee||0)+(data.examFee||0)+(data.libraryFee||0)+(data.labFee||0)+(data.otherFee||0);
-      const arr = load(KEYS.feeStructures).map(f => f.id === id ? { ...f, ...data, total } : f);
-      save(KEYS.feeStructures, arr);
-    },
-    delete: (id) => {
-      save(KEYS.feeStructures, load(KEYS.feeStructures).filter(f => f.id !== id));
-    },
-  };
+// ── DB object (same interface as before) ──────────────────────
+const DB = {
 
-  // ── STUDENTS ─────────────────────────────────────────────
-  const Students = {
-    all: () => load(KEYS.students),
-    get: (id) => load(KEYS.students).find(s => s.id === id),
-    add: (data) => {
-      const arr = load(KEYS.students);
-      const item = { ...data, id: nextId(arr) };
-      arr.push(item); save(KEYS.students, arr); return item;
-    },
-    update: (id, data) => {
-      const arr = load(KEYS.students).map(s => s.id === id ? { ...s, ...data } : s);
-      save(KEYS.students, arr);
-    },
-    delete: (id) => {
-      save(KEYS.students, load(KEYS.students).filter(s => s.id !== id));
-    },
-    search: (query) => {
-      const q = query.toLowerCase();
-      return load(KEYS.students).filter(s =>
-        s.name.toLowerCase().includes(q) ||
-        s.rollNo.toLowerCase().includes(q) ||
-        s.email.toLowerCase().includes(q)
+  // ── Load all data into cache ── call once on app start ──────
+  load: async () => {
+    try {
+      const [courses, fees, students, payments, subjects, timetable, attendance, results] = await Promise.all([
+        sbFetch('courses?order=id'),
+        sbFetch('fee_structures?order=id'),
+        sbFetch('students?order=id'),
+        sbFetch('payments?order=id'),
+        sbFetch('course_subjects?order=id'),
+        sbFetch('timetable?order=id'),
+        sbFetch('attendance?order=id'),
+        sbFetch('exam_results?order=id'),
+      ]);
+      _cache.courses        = (courses     || []).map(mapCourse);
+      _cache.feeStructures  = (fees        || []).map(mapFeeStructure);
+      _cache.students       = (students    || []).map(mapStudent);
+      _cache.payments       = (payments    || []).map(mapPayment);
+      _cache.courseSubjects = (subjects    || []).map(mapSubject);
+      _cache.timetable      = (timetable   || []).map(mapTimetable);
+      _cache.attendance     = (attendance  || []).map(mapAttendance);
+      _cache.examResults    = (results     || []).map(mapExamResult);
+      return true;
+    } catch(e) {
+      console.error('DB.load failed:', e);
+      return false;
+    }
+  },
+
+  // Keep seed as a no-op — data lives in Supabase now
+  seed: () => {},
+
+  // ── Collections ──────────────────────────────────────────────
+  Courses: makeCollection('courses', 'courses', mapCourse, toDbCourse),
+
+  FeeStructures: makeCollection('fee_structures', 'feeStructures', mapFeeStructure, toDbFeeStructure, {
+    byCourse:    (courseId)       => _cache.feeStructures.filter(f => f.courseId === courseId),
+    byCourseYear:(courseId, year) => _cache.feeStructures.find(f => f.courseId === courseId && f.year === parseInt(year)),
+  }),
+
+  Students: makeCollection('students', 'students', mapStudent, toDbStudent, {
+    search: (q) => {
+      const lq = q.toLowerCase();
+      return _cache.students.filter(s =>
+        s.name.toLowerCase().includes(lq) ||
+        s.rollNo.toLowerCase().includes(lq) ||
+        (s.email||'').toLowerCase().includes(lq)
       );
     },
-  };
+  }),
 
-  // ── PAYMENTS ─────────────────────────────────────────────
-  const Payments = {
-    all: () => load(KEYS.payments),
-    get: (id) => load(KEYS.payments).find(p => p.id === id),
-    byStudent: (studentId) => load(KEYS.payments).filter(p => p.studentId === studentId),
-    add: (data) => {
-      const arr = load(KEYS.payments);
-      const item = { ...data, id: nextId(arr) };
-      arr.push(item); save(KEYS.payments, arr); return item;
-    },
-    update: (id, data) => {
-      const arr = load(KEYS.payments).map(p => p.id === id ? { ...p, ...data } : p);
-      save(KEYS.payments, arr);
-    },
-    delete: (id) => {
-      save(KEYS.payments, load(KEYS.payments).filter(p => p.id !== id));
-    },
-  };
+  Payments: makeCollection('payments', 'payments', mapPayment, toDbPayment, {
+    byStudent: (studentId) => _cache.payments.filter(p => p.studentId === studentId),
+  }),
 
-  // ── STATS (for dashboard) ────────────────────────────────
-  const Stats = {
-    summary: () => {
-      const students  = load(KEYS.students);
-      const payments  = load(KEYS.payments);
-      const totalFeesDue      = payments.reduce((s, p) => s + p.amount, 0);
-      const totalFeesPaid     = payments.reduce((s, p) => s + p.paidAmount, 0);
-      const totalFeesBalance  = totalFeesDue - totalFeesPaid;
-      const paidCount         = payments.filter(p => p.status === 'Paid').length;
-      const pendingCount      = payments.filter(p => p.status === 'Pending').length;
-      const partialCount      = payments.filter(p => p.status === 'Partial').length;
-      return {
-        totalStudents:     students.length,
-        activeStudents:    students.filter(s => s.status === 'Active').length,
-        totalFeesDue,
-        totalFeesPaid,
-        totalFeesBalance,
-        paidCount,
-        pendingCount,
-        partialCount,
-      };
-    },
-    recentPayments: (limit = 5) => {
-      return load(KEYS.payments)
-        .filter(p => p.paymentDate)
-        .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
-        .slice(0, limit);
-    },
-    collectionByMonth: () => {
-      const map = {};
-      load(KEYS.payments).forEach(p => {
-        if (!p.paymentDate) return;
-        const month = p.paymentDate.slice(0, 7);
-        map[month] = (map[month] || 0) + p.paidAmount;
-      });
-      return Object.entries(map).sort(([a],[b]) => a.localeCompare(b));
-    },
-  };
+  CourseSubjects: makeCollection('course_subjects', 'courseSubjects', mapSubject, toDbSubject, {
+    byCourseYear: (courseId, year) => _cache.courseSubjects.filter(s => s.courseId === courseId && s.year === parseInt(year)),
+  }),
 
-  // ── COURSE SUBJECTS ──────────────────────────────────────
-  const CourseSubjects = {
-    all: () => load(KEYS.courseSubjects),
-    get: (id) => load(KEYS.courseSubjects).find(s => s.id === id),
-    byCourseYear: (courseId, year) => load(KEYS.courseSubjects).filter(s => s.courseId === courseId && s.year === parseInt(year)),
-    add: (data) => {
-      const arr = load(KEYS.courseSubjects);
-      const item = { ...data, id: nextId(arr) };
-      arr.push(item); save(KEYS.courseSubjects, arr); return item;
-    },
-    update: (id, data) => {
-      const arr = load(KEYS.courseSubjects).map(s => s.id === id ? { ...s, ...data } : s);
-      save(KEYS.courseSubjects, arr);
-    },
-    delete: (id) => {
-      save(KEYS.courseSubjects, load(KEYS.courseSubjects).filter(s => s.id !== id));
-    },
-  };
+  Timetable: makeCollection('timetable', 'timetable', mapTimetable, toDbTimetable, {
+    byCourseYear: (courseId, year) => _cache.timetable.filter(t => t.courseId === courseId && t.year === parseInt(year)),
+  }),
 
-  // ── TIMETABLE ────────────────────────────────────────────
-  const Timetable = {
-    all: () => load(KEYS.timetable),
-    get: (id) => load(KEYS.timetable).find(t => t.id === id),
-    byCourseYear: (courseId, year) => load(KEYS.timetable).filter(t => t.courseId === courseId && t.year === parseInt(year)),
-    add: (data) => {
-      const arr = load(KEYS.timetable);
-      const item = { ...data, id: nextId(arr) };
-      arr.push(item); save(KEYS.timetable, arr); return item;
-    },
-    update: (id, data) => {
-      const arr = load(KEYS.timetable).map(t => t.id === id ? { ...t, ...data } : t);
-      save(KEYS.timetable, arr);
-    },
-    delete: (id) => {
-      save(KEYS.timetable, load(KEYS.timetable).filter(t => t.id !== id));
-    },
-  };
+  Attendance: {
+    all:       ()          => _cache.attendance,
+    get:       (id)        => _cache.attendance.find(a => a.id === id),
+    byStudent: (studentId) => _cache.attendance.filter(a => a.studentId === studentId),
 
-  // ── ATTENDANCE ───────────────────────────────────────────
-  const Attendance = {
-    all: () => load(KEYS.attendance),
-    get: (id) => load(KEYS.attendance).find(a => a.id === id),
-    byStudent: (studentId) => load(KEYS.attendance).filter(a => a.studentId === studentId),
-    // Returns { present, absent, total, pct } grouped by subjectCode for a student
     summaryByStudent: (studentId) => {
-      const recs = load(KEYS.attendance).filter(a => a.studentId === studentId);
-      const map = {};
+      const recs = _cache.attendance.filter(a => a.studentId === studentId);
+      const map  = {};
       recs.forEach(a => {
         if (!map[a.subjectCode]) map[a.subjectCode] = { subjectCode: a.subjectCode, subjectName: a.subjectName, present: 0, absent: 0 };
         if (a.status === 'Present') map[a.subjectCode].present++;
         else map[a.subjectCode].absent++;
       });
-      return Object.values(map).map(s => ({ ...s, total: s.present + s.absent, pct: s.present + s.absent > 0 ? Math.round((s.present / (s.present + s.absent)) * 100) : 0 }));
+      return Object.values(map).map(s => ({
+        ...s, total: s.present + s.absent,
+        pct: s.present + s.absent > 0 ? Math.round((s.present / (s.present + s.absent)) * 100) : 0,
+      }));
     },
-    add: (data) => {
-      const arr = load(KEYS.attendance);
-      const item = { ...data, id: nextId(arr) };
-      arr.push(item); save(KEYS.attendance, arr); return item;
+
+    add: async (data) => {
+      const rows = await sbFetch('attendance', { method: 'POST', body: JSON.stringify(toDbAttendance(data)) });
+      const item = mapAttendance(rows[0]);
+      _cache.attendance.push(item);
+      return item;
     },
-    update: (id, data) => {
-      const arr = load(KEYS.attendance).map(a => a.id === id ? { ...a, ...data } : a);
-      save(KEYS.attendance, arr);
+    update: async (id, data) => {
+      await sbFetch(`attendance?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: data.status }) });
+      const idx = _cache.attendance.findIndex(a => a.id === id);
+      if (idx >= 0) _cache.attendance[idx] = { ..._cache.attendance[idx], ...data };
     },
-    delete: (id) => {
-      save(KEYS.attendance, load(KEYS.attendance).filter(a => a.id !== id));
+    delete: async (id) => {
+      await sbFetch(`attendance?id=eq.${id}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+      _cache.attendance = _cache.attendance.filter(a => a.id !== id);
     },
-    // Bulk-upsert: add attendance for multiple students at once (used by admin mark-attendance)
-    bulkMark: (records) => {
-      const arr = load(KEYS.attendance);
-      records.forEach(r => {
-        const existing = arr.find(a => a.studentId === r.studentId && a.subjectCode === r.subjectCode && a.date === r.date);
-        if (existing) { existing.status = r.status; }
-        else { arr.push({ ...r, id: nextId(arr) }); }
+    bulkMark: async (records) => {
+      // upsert all records at once using Supabase upsert (on conflict update)
+      const rows = records.map(toDbAttendance);
+      await sbFetch('attendance', {
+        method:  'POST',
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+        body:    JSON.stringify(rows),
       });
-      save(KEYS.attendance, arr);
+      // Reload attendance cache
+      const fresh = await sbFetch('attendance?order=id');
+      _cache.attendance = (fresh || []).map(mapAttendance);
     },
-  };
+    reload: async () => {
+      const rows = await sbFetch('attendance?order=id');
+      _cache.attendance = (rows || []).map(mapAttendance);
+    },
+  },
 
-  // ── EXAM RESULTS ─────────────────────────────────────────
-  const ExamResults = {
-    all: () => load(KEYS.examResults),
-    get: (id) => load(KEYS.examResults).find(r => r.id === id),
-    byStudent: (studentId) => load(KEYS.examResults).filter(r => r.studentId === studentId),
-    add: (data) => {
-      const arr = load(KEYS.examResults);
-      const item = { ...data, id: nextId(arr) };
-      arr.push(item); save(KEYS.examResults, arr); return item;
-    },
-    update: (id, data) => {
-      const arr = load(KEYS.examResults).map(r => r.id === id ? { ...r, ...data } : r);
-      save(KEYS.examResults, arr);
-    },
-    delete: (id) => {
-      save(KEYS.examResults, load(KEYS.examResults).filter(r => r.id !== id));
-    },
-  };
+  ExamResults: makeCollection('exam_results', 'examResults', mapExamResult, toDbExamResult, {
+    byStudent: (studentId) => _cache.examResults.filter(r => r.studentId === studentId),
+  }),
 
-  return { seed, Courses, FeeStructures, Students, Payments, Stats, CourseSubjects, Timetable, Attendance, ExamResults };
-})();
+  // ── Stats (computed from cache) ───────────────────────────
+  Stats: {
+    summary: () => {
+      const students = _cache.students;
+      const payments = _cache.payments;
+      return {
+        totalStudents:    students.length,
+        activeStudents:   students.filter(s => s.status === 'Active').length,
+        totalFeesDue:     payments.reduce((s, p) => s + p.amount, 0),
+        totalFeesPaid:    payments.reduce((s, p) => s + p.paidAmount, 0),
+        totalFeesBalance: payments.reduce((s, p) => s + (p.amount - p.paidAmount), 0),
+        paidCount:        payments.filter(p => p.status === 'Paid').length,
+        pendingCount:     payments.filter(p => p.status === 'Pending').length,
+        partialCount:     payments.filter(p => p.status === 'Partial').length,
+      };
+    },
+    recentPayments: (limit = 5) =>
+      [..._cache.payments]
+        .filter(p => p.paymentDate)
+        .sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
+        .slice(0, limit),
+    collectionByMonth: () => {
+      const map = {};
+      _cache.payments.forEach(p => {
+        if (!p.paymentDate) return;
+        const month = p.paymentDate.slice(0, 7);
+        map[month] = (map[month] || 0) + p.paidAmount;
+      });
+      return Object.entries(map).sort(([a], [b]) => a.localeCompare(b));
+    },
+  },
+};

@@ -318,21 +318,39 @@
   const auth = JSON.parse(authRaw);
   if (auth.role !== 'student') { window.location.replace('index.html'); }
 
-  DB.seed(); // ensure seed data exists (handles v2 re-seed)
+  DB.seed(); // no-op now — data is in Supabase
 
-  // ── Data ─────────────────────────────────────────────────
-  function loadData() {
-    return {
-      student:      DB.Students.get(auth.studentId),
-      courses:      DB.Courses.all(),
-      payments:     DB.Payments.byStudent(auth.studentId),
-      subjects:     DB.CourseSubjects.all(),
-      timetable:    DB.Timetable.all(),
-      attAll:       DB.Attendance.byStudent(auth.studentId),
-      attSummary:   DB.Attendance.summaryByStudent(auth.studentId),
-      results:      DB.ExamResults.byStudent(auth.studentId),
-    };
+  // ── Load data from Supabase ───────────────────────────────
+  const SUPA_URL2 = 'https://sbbmcosqxjngmqnpgucw.supabase.co';
+  const SUPA_KEY2 = 'sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B';
+
+  async function spFetch(path) {
+    const res = await fetch(`${SUPA_URL2}/rest/v1/${path}`, {
+      headers: { 'apikey': SUPA_KEY2, 'Authorization': `Bearer ${SUPA_KEY2}` }
+    });
+    return res.ok ? res.json() : [];
   }
+
+  // Show loading
+  document.querySelector('.content').insertAdjacentHTML('afterbegin',
+    `<div id="sp-loading" style="text-align:center;padding:48px;color:#64748b">
+       <div style="width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div>
+       <p>Loading your data…</p>
+       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+     </div>`);
+
+  // Fetch everything in parallel
+  const [rawStudents, rawCourses, rawPayments, rawSubjects, rawTimetable, rawAttendance, rawResults] = await Promise.all([
+    spFetch(`students?roll_no=eq.${encodeURIComponent(auth.username)}`),
+    spFetch('courses?order=id'),
+    spFetch(`payments?student_id=eq.${auth.studentId}&order=id`),
+    spFetch('course_subjects?order=id'),
+    spFetch('timetable?order=id'),
+    spFetch(`attendance?student_id=eq.${auth.studentId}&order=id`),
+    spFetch(`exam_results?student_id=eq.${auth.studentId}&order=id`),
+  ]);
+
+  document.getElementById('sp-loading')?.remove();
 
   // ── Helpers ──────────────────────────────────────────────
   const fmtCur = n => '₹' + Number(n||0).toLocaleString('en-IN');
@@ -708,6 +726,42 @@
 </body></html>`);
     win.document.close();
   }
+
+  // Map DB rows to camelCase
+  function mS(r)  { return { id:r.id, rollNo:r.roll_no, name:r.name, email:r.email||'', phone:r.phone||'', dob:r.dob||'', gender:r.gender||'', address:r.address||'', courseId:r.course_id, year:r.year, status:r.status, admissionDate:r.admission_date||'' }; }
+  function mC(r)  { return { id:r.id, name:r.name, duration:r.duration, department:r.department }; }
+  function mP(r)  { return { id:r.id, studentId:r.student_id, amount:r.amount, paidAmount:r.paid_amount, paymentDate:r.payment_date||'', method:r.method||'', receiptNo:r.receipt_no||'', status:r.status, remark:r.remark||'' }; }
+  function mSb(r) { return { id:r.id, courseId:r.course_id, year:r.year, code:r.code, name:r.name, credits:r.credits }; }
+  function mT(r)  { return { id:r.id, courseId:r.course_id, year:r.year, day:r.day, period:r.period, subjectCode:r.subject_code, subjectName:r.subject_name, room:r.room||'', faculty:r.faculty||'' }; }
+  function mA(r)  { return { id:r.id, studentId:r.student_id, subjectCode:r.subject_code, subjectName:r.subject_name, date:r.date, status:r.status }; }
+  function mR(r)  { return { id:r.id, studentId:r.student_id, semester:r.semester, subjectCode:r.subject_code, subjectName:r.subject_name, maxMarks:r.max_marks, cieMarks:r.cie_marks, seeMarks:r.see_marks, totalMarks:r.total_marks, grade:r.grade||'', result:r.result||'' }; }
+
+  const spData = {
+    student:    rawStudents.length ? mS(rawStudents[0]) : null,
+    courses:    rawCourses.map(mC),
+    payments:   rawPayments.map(mP),
+    subjects:   rawSubjects.map(mSb),
+    timetable:  rawTimetable.map(mT),
+    attAll:     rawAttendance.map(mA),
+    attSummary: (() => {
+      const map = {};
+      rawAttendance.forEach(r => {
+        if (!map[r.subject_code]) map[r.subject_code] = { subjectCode:r.subject_code, subjectName:r.subject_name, present:0, absent:0 };
+        if (r.status === 'Present') map[r.subject_code].present++; else map[r.subject_code].absent++;
+      });
+      return Object.values(map).map(s => ({ ...s, total:s.present+s.absent, pct:s.present+s.absent>0?Math.round((s.present/(s.present+s.absent))*100):0 }));
+    })(),
+    results: rawResults.map(mR),
+  };
+
+  // update auth studentId from DB if needed
+  if (spData.student && !auth.studentId) {
+    auth.studentId = spData.student.id;
+    sessionStorage.setItem('cfms_auth', JSON.stringify(auth));
+  }
+
+  // Override loadData to return Supabase data
+  function loadData() { return spData; }
 
   // Boot
   renderAll();

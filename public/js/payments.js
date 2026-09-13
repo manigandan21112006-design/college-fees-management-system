@@ -136,49 +136,31 @@ function generateReceiptNo() {
   document.getElementById('payment-receipt').value = 'RCP' + String(num).padStart(3, '0');
 }
 
-function savePayment() {
+async function savePayment() {
   const paidAmount = parseFloat(document.getElementById('payment-paid').value) || 0;
   const amount     = parseFloat(document.getElementById('payment-amount').value) || 0;
-
   let status = 'Pending';
-  if (paidAmount >= amount)      status = 'Paid';
-  else if (paidAmount > 0)       status = 'Partial';
-
+  if (paidAmount >= amount) status = 'Paid';
+  else if (paidAmount > 0)  status = 'Partial';
   const statusOverride = document.getElementById('payment-status').value;
   if (statusOverride) status = statusOverride;
-
   const data = {
-    studentId:   parseInt(document.getElementById('payment-student').value),
-    amount,
-    paidAmount,
-    paymentDate: document.getElementById('payment-date').value,
-    method:      document.getElementById('payment-method').value,
-    receiptNo:   document.getElementById('payment-receipt').value.trim(),
-    remark:      document.getElementById('payment-remark').value.trim(),
-    status,
+    studentId: parseInt(document.getElementById('payment-student').value), amount, paidAmount,
+    paymentDate: document.getElementById('payment-date').value, method: document.getElementById('payment-method').value,
+    receiptNo: document.getElementById('payment-receipt').value.trim(), remark: document.getElementById('payment-remark').value.trim(), status,
   };
-
-  if (!data.studentId || !data.amount) {
-    toast('Please select a student and enter the fee amount.', 'error');
-    return;
-  }
-
-  if (editPaymentId) {
-    DB.Payments.update(editPaymentId, data);
-    toast('Payment updated!', 'success');
-  } else {
-    DB.Payments.add(data);
-    toast('Payment recorded!', 'success');
-  }
-  closeModal('payment-modal');
-  renderPayments();
+  if (!data.studentId || !data.amount) { toast('Please select a student and enter the fee amount.', 'error'); return; }
+  try {
+    if (editPaymentId) { await DB.Payments.update(editPaymentId, data); toast('Payment updated!', 'success'); }
+    else               { await DB.Payments.add(data);                   toast('Payment recorded!', 'success'); }
+    closeModal('payment-modal'); renderPayments();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function deletePayment(id) {
+async function deletePayment(id) {
   if (!confirmAction('Delete this payment record?')) return;
-  DB.Payments.delete(id);
-  toast('Payment deleted.', 'info');
-  renderPayments();
+  try { await DB.Payments.delete(id); toast('Payment deleted.', 'info'); renderPayments(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // ── Print Receipt ────────────────────────────────────────────

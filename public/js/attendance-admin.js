@@ -92,19 +92,17 @@ function renderAttendanceRows() {
   }).join('');
 }
 
-function toggleAttendance(id) {
+async function toggleAttendance(id) {
   const rec = DB.Attendance.get(id);
   if (!rec) return;
-  DB.Attendance.update(id, { status: rec.status === 'Present' ? 'Absent' : 'Present' });
-  toast('Attendance updated.', 'success');
-  renderAttendanceRows();
+  try { await DB.Attendance.update(id, { status: rec.status === 'Present' ? 'Absent' : 'Present' }); toast('Attendance updated.', 'success'); renderAttendanceRows(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function deleteAttendanceRecord(id) {
+async function deleteAttendanceRecord(id) {
   if (!confirmAction('Delete this attendance record?')) return;
-  DB.Attendance.delete(id);
-  toast('Record deleted.', 'info');
-  renderAttendanceRows();
+  try { await DB.Attendance.delete(id); toast('Record deleted.', 'info'); renderAttendanceRows(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // ── Mark Attendance Modal ─────────────────────────────────
@@ -167,24 +165,21 @@ function markAllAbsent() {
   document.querySelectorAll('#mark-att-students input[value="Absent"]').forEach(r => r.checked = true);
 }
 
-function saveAttendance() {
+async function saveAttendance() {
   const courseId = parseInt(document.getElementById('mark-att-course').value);
   const year     = parseInt(document.getElementById('mark-att-year').value);
   const date     = document.getElementById('mark-att-date').value;
   const subVal   = document.getElementById('mark-att-subject').value;
-
   if (!date || !subVal) { toast('Please select a date and subject.', 'error'); return; }
-
   const [subjectCode, subjectName] = subVal.split('|');
   const students = DB.Students.all().filter(s => s.courseId === courseId && s.year === year && s.status === 'Active');
-
-  const records = students.map(s => {
+  const records  = students.map(s => {
     const radio = document.querySelector(`input[name="att_${s.id}"]:checked`);
     return { studentId: s.id, subjectCode, subjectName, date, status: radio ? radio.value : 'Present' };
   });
-
-  DB.Attendance.bulkMark(records);
-  toast(`Attendance saved for ${records.length} students.`, 'success');
-  closeModal('attendance-modal');
-  renderAttendanceRows();
+  try {
+    await DB.Attendance.bulkMark(records);
+    toast(`Attendance saved for ${records.length} students.`, 'success');
+    closeModal('attendance-modal'); renderAttendanceRows();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }

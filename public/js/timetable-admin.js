@@ -127,40 +127,22 @@ function onTtCourseChange() {
     : '<option value="">No subjects for this course/year</option>';
 }
 
-function saveTimetable() {
+async function saveTimetable() {
   const courseId = parseInt(document.getElementById('tt-course').value);
   const year     = parseInt(document.getElementById('tt-year').value);
   const subCode  = document.getElementById('tt-subject').value;
-  const subjects = DB.CourseSubjects.byCourseYear(courseId, year);
-  const subj     = subjects.find(s => s.code === subCode);
-
-  const data = {
-    courseId,
-    year,
-    day:         document.getElementById('tt-day').value,
-    period:      document.getElementById('tt-period').value.trim(),
-    subjectCode: subCode,
-    subjectName: subj ? subj.name : subCode,
-    room:        document.getElementById('tt-room').value.trim(),
-    faculty:     document.getElementById('tt-faculty').value.trim(),
-  };
-
+  const subj     = DB.CourseSubjects.byCourseYear(courseId, year).find(s => s.code === subCode);
+  const data = { courseId, year, day: document.getElementById('tt-day').value, period: document.getElementById('tt-period').value.trim(), subjectCode: subCode, subjectName: subj ? subj.name : subCode, room: document.getElementById('tt-room').value.trim(), faculty: document.getElementById('tt-faculty').value.trim() };
   if (!data.period || !data.subjectCode) { toast('Please fill required fields.', 'error'); return; }
-
-  if (editTimetableId) {
-    DB.Timetable.update(editTimetableId, data);
-    toast('Slot updated!', 'success');
-  } else {
-    DB.Timetable.add(data);
-    toast('Slot added!', 'success');
-  }
-  closeModal('timetable-modal');
-  renderTimetableGrid();
+  try {
+    if (editTimetableId) { await DB.Timetable.update(editTimetableId, data); toast('Slot updated!', 'success'); }
+    else                 { await DB.Timetable.add(data);                     toast('Slot added!', 'success');   }
+    closeModal('timetable-modal'); renderTimetableGrid();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function deleteTimetable(id) {
+async function deleteTimetable(id) {
   if (!confirmAction('Delete this timetable slot?')) return;
-  DB.Timetable.delete(id);
-  toast('Slot deleted.', 'info');
-  renderTimetableGrid();
+  try { await DB.Timetable.delete(id); toast('Slot deleted.', 'info'); renderTimetableGrid(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }

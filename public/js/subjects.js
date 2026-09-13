@@ -107,30 +107,24 @@ function populateSubjectCourseDropdown() {
   sel.innerHTML = DB.Courses.all().map(c => `<option value="${c.id}">${c.name}</option>`).join('');
 }
 
-function saveSubject() {
+async function saveSubject() {
   const data = {
-    code:     document.getElementById('subject-code').value.trim().toUpperCase(),
-    name:     document.getElementById('subject-name').value.trim(),
+    code: document.getElementById('subject-code').value.trim().toUpperCase(),
+    name: document.getElementById('subject-name').value.trim(),
     courseId: parseInt(document.getElementById('subject-course').value),
-    year:     parseInt(document.getElementById('subject-year').value),
-    credits:  parseInt(document.getElementById('subject-credits').value) || 3,
+    year: parseInt(document.getElementById('subject-year').value),
+    credits: parseInt(document.getElementById('subject-credits').value) || 3,
   };
   if (!data.code || !data.name || !data.courseId) { toast('Please fill all required fields.', 'error'); return; }
-
-  if (editSubjectId) {
-    DB.CourseSubjects.update(editSubjectId, data);
-    toast('Subject updated!', 'success');
-  } else {
-    DB.CourseSubjects.add(data);
-    toast('Subject added!', 'success');
-  }
-  closeModal('subject-modal');
-  renderSubjects();
+  try {
+    if (editSubjectId) { await DB.CourseSubjects.update(editSubjectId, data); toast('Subject updated!', 'success'); }
+    else               { await DB.CourseSubjects.add(data);                   toast('Subject added!', 'success');   }
+    closeModal('subject-modal'); renderSubjects();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function deleteSubject(id) {
+async function deleteSubject(id) {
   if (!confirmAction('Delete this subject?')) return;
-  DB.CourseSubjects.delete(id);
-  toast('Subject deleted.', 'info');
-  renderSubjects();
+  try { await DB.CourseSubjects.delete(id); toast('Subject deleted.', 'info'); renderSubjects(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }

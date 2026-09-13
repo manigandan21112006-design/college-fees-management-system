@@ -141,44 +141,23 @@ function autoGrade(cie, see, max) {
   return { grade: 'F', result: 'Fail' };
 }
 
-function saveResult() {
-  const cieMarks      = parseFloat(document.getElementById('result-cie').value) || 0;
-  const seeMarks      = parseFloat(document.getElementById('result-see').value) || 0;
-  const maxMarks      = parseFloat(document.getElementById('result-max').value) || 100;
+async function saveResult() {
+  const cieMarks = parseFloat(document.getElementById('result-cie').value)||0;
+  const seeMarks = parseFloat(document.getElementById('result-see').value)||0;
+  const maxMarks = parseFloat(document.getElementById('result-max').value)||100;
   const gradeOverride = document.getElementById('result-grade').value;
-  const auto          = autoGrade(cieMarks, seeMarks, maxMarks);
-
-  const data = {
-    studentId:   parseInt(document.getElementById('result-student').value),
-    semester:    document.getElementById('result-sem').value.trim(),
-    subjectCode: document.getElementById('result-code').value.trim().toUpperCase(),
-    subjectName: document.getElementById('result-subject').value.trim(),
-    maxMarks,
-    cieMarks,
-    seeMarks,
-    totalMarks: cieMarks + seeMarks,
-    grade:  gradeOverride || auto.grade,
-    result: auto.result,
-  };
-
-  if (!data.studentId || !data.semester || !data.subjectCode) {
-    toast('Please fill all required fields.', 'error'); return;
-  }
-
-  if (editResultId) {
-    DB.ExamResults.update(editResultId, data);
-    toast('Result updated!', 'success');
-  } else {
-    DB.ExamResults.add(data);
-    toast('Result added!', 'success');
-  }
-  closeModal('result-modal');
-  renderExamsAdmin();
+  const auto = autoGrade(cieMarks, seeMarks, maxMarks);
+  const data = { studentId: parseInt(document.getElementById('result-student').value), semester: document.getElementById('result-sem').value.trim(), subjectCode: document.getElementById('result-code').value.trim().toUpperCase(), subjectName: document.getElementById('result-subject').value.trim(), maxMarks, cieMarks, seeMarks, totalMarks: cieMarks + seeMarks, grade: gradeOverride || auto.grade, result: auto.result };
+  if (!data.studentId || !data.semester || !data.subjectCode) { toast('Please fill all required fields.', 'error'); return; }
+  try {
+    if (editResultId) { await DB.ExamResults.update(editResultId, data); toast('Result updated!', 'success'); }
+    else              { await DB.ExamResults.add(data);                  toast('Result added!', 'success');   }
+    closeModal('result-modal'); renderExamsAdmin();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function deleteResult(id) {
+async function deleteResult(id) {
   if (!confirmAction('Delete this result?')) return;
-  DB.ExamResults.delete(id);
-  toast('Result deleted.', 'info');
-  renderExamsAdmin();
+  try { await DB.ExamResults.delete(id); toast('Result deleted.', 'info'); renderExamsAdmin(); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }

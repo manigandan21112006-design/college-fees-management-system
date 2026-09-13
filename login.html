@@ -342,7 +342,7 @@
     }
 
     // ── Student login ──
-    function handleStudentLogin(e) {
+    async function handleStudentLogin(e) {
       e.preventDefault();
       const btn     = document.getElementById('student-login-btn');
       const errorEl = document.getElementById('error-msg');
@@ -358,21 +358,22 @@
       }
 
       const dob = `${year}-${month}-${day}`;
-
       btn.disabled  = true;
       btn.innerHTML = '<span class="spinner"></span>Verifying…';
       errorEl.classList.remove('show');
 
-      setTimeout(() => {
-        // Read students from localStorage (seeded by db.js)
-        const students = JSON.parse(localStorage.getItem('cfms_students') || '[]');
-        const student  = students.find(s =>
-          s.rollNo.toUpperCase() === roll && s.dob === dob
+      try {
+        // Look up student in Supabase
+        const res = await fetch(
+          `https://sbbmcosqxjngmqnpgucw.supabase.co/rest/v1/students?roll_no=eq.${encodeURIComponent(roll)}&dob=eq.${dob}`,
+          { headers: { 'apikey': 'sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B', 'Authorization': 'Bearer sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B' } }
         );
+        const students = await res.json();
 
-        if (student) {
+        if (students && students.length > 0) {
+          const student = students[0];
           sessionStorage.setItem('cfms_auth', JSON.stringify({
-            username: student.rollNo, display: student.name,
+            username: student.roll_no, display: student.name,
             role: 'student', studentId: student.id,
             loginAt: new Date().toISOString(),
           }));
@@ -383,7 +384,12 @@
           btn.disabled  = false;
           btn.innerHTML = 'Login as Student';
         }
-      }, 600);
+      } catch(err) {
+        errorEl.textContent = '❌ Could not connect to server. Check your internet connection.';
+        errorEl.classList.add('show');
+        btn.disabled  = false;
+        btn.innerHTML = 'Login as Student';
+      }
     }
 
     function togglePassword() {

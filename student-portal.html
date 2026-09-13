@@ -325,32 +325,52 @@
   const SUPA_KEY2 = 'sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B';
 
   async function spFetch(path) {
-    const res = await fetch(`${SUPA_URL2}/rest/v1/${path}`, {
-      headers: { 'apikey': SUPA_KEY2, 'Authorization': `Bearer ${SUPA_KEY2}` }
-    });
-    return res.ok ? res.json() : [];
+    try {
+      const res = await fetch(`${SUPA_URL2}/rest/v1/${path}`, {
+        headers: { 'apikey': SUPA_KEY2, 'Authorization': `Bearer ${SUPA_KEY2}` }
+      });
+      return res.ok ? res.json() : [];
+    } catch(e) { return []; }
   }
 
-  // Show loading
-  document.querySelector('.content').insertAdjacentHTML('afterbegin',
-    `<div id="sp-loading" style="text-align:center;padding:48px;color:#64748b">
-       <div style="width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div>
-       <p>Loading your data…</p>
-       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-     </div>`);
+  // Wrap everything in async function — top-level await not supported in regular scripts
+  async function initPortal() {
+    // Show loading
+    document.querySelector('.content').insertAdjacentHTML('afterbegin',
+      `<div id="sp-loading" style="text-align:center;padding:48px;color:#64748b">
+         <div style="width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div>
+         <p>Loading your data…</p>
+         <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+       </div>`);
 
-  // Fetch everything in parallel
-  const [rawStudents, rawCourses, rawPayments, rawSubjects, rawTimetable, rawAttendance, rawResults] = await Promise.all([
-    spFetch(`students?roll_no=ilike.${encodeURIComponent(auth.username)}`),
-    spFetch('courses?order=id'),
-    spFetch(`payments?student_id=eq.${auth.studentId}&order=id`),
-    spFetch('course_subjects?order=id'),
-    spFetch('timetable?order=id'),
-    spFetch(`attendance?student_id=eq.${auth.studentId}&order=id`),
-    spFetch(`exam_results?student_id=eq.${auth.studentId}&order=id`),
-  ]);
+    // Fetch student first to get their ID
+    const rawStudents = await spFetch(`students?roll_no=ilike.${encodeURIComponent(auth.username)}`);
 
-  document.getElementById('sp-loading')?.remove();
+    if (!rawStudents || rawStudents.length === 0) {
+      document.getElementById('sp-loading')?.remove();
+      document.querySelector('.content').innerHTML =
+        '<div class="empty" style="padding:60px"><div class="ico">😕</div><p style="margin-top:12px">Student record not found. Contact admin.</p></div>';
+      return;
+    }
+
+    const studentRow = rawStudents[0];
+    const studentId  = studentRow.id;
+
+    // Update auth with correct studentId
+    auth.studentId = studentId;
+    sessionStorage.setItem('cfms_auth', JSON.stringify(auth));
+
+    // Fetch everything else in parallel using the confirmed studentId
+    const [rawCourses, rawPayments, rawSubjects, rawTimetable, rawAttendance, rawResults] = await Promise.all([
+      spFetch('courses?order=id'),
+      spFetch(`payments?student_id=eq.${studentId}&order=id`),
+      spFetch('course_subjects?order=id'),
+      spFetch('timetable?order=id'),
+      spFetch(`attendance?student_id=eq.${studentId}&order=id`),
+      spFetch(`exam_results?student_id=eq.${studentId}&order=id`),
+    ]);
+
+    document.getElementById('sp-loading')?.remove();
 
   // ── Helpers ──────────────────────────────────────────────
   const fmtCur = n => '₹' + Number(n||0).toLocaleString('en-IN');
@@ -737,7 +757,7 @@
   function mR(r)  { return { id:r.id, studentId:r.student_id, semester:r.semester, subjectCode:r.subject_code, subjectName:r.subject_name, maxMarks:r.max_marks, cieMarks:r.cie_marks, seeMarks:r.see_marks, totalMarks:r.total_marks, grade:r.grade||'', result:r.result||'' }; }
 
   const spData = {
-    student:    rawStudents.length ? mS(rawStudents[0]) : null,
+    student:    mS(studentRow),
     courses:    rawCourses.map(mC),
     payments:   rawPayments.map(mP),
     subjects:   rawSubjects.map(mSb),
@@ -754,17 +774,21 @@
     results: rawResults.map(mR),
   };
 
-  // update auth studentId from DB if needed
-  if (spData.student && !auth.studentId) {
-    auth.studentId = spData.student.id;
-    sessionStorage.setItem('cfms_auth', JSON.stringify(auth));
-  }
-
   // Override loadData to return Supabase data
   function loadData() { return spData; }
 
   // Boot
   renderAll();
+
+  } // end initPortal
+
+  // Start the portal
+  initPortal().catch(err => {
+    console.error('Portal error:', err);
+    document.getElementById('sp-loading')?.remove();
+    document.querySelector('.content').insertAdjacentHTML('afterbegin',
+      '<div style="background:#fee2e2;color:#991b1b;padding:16px 20px;border-radius:10px;margin-bottom:16px;font-weight:600">⚠️ Failed to load data. Please check your internet and refresh.</div>');
+  });
 </script>
 </body>
 </html>

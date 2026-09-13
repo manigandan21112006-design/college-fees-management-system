@@ -321,11 +321,89 @@
   const auth = JSON.parse(authRaw);
   if (auth.role !== 'student') { window.location.replace('index.html'); }
 
-  DB.seed(); // no-op now — data is in Supabase
+  DB.seed(); // no-op — data is in Supabase
 
-  // ── Load data from Supabase ───────────────────────────────
+  // ── Supabase fetch ────────────────────────────────────────
   const SUPA_URL2 = 'https://sbbmcosqxjngmqnpgucw.supabase.co';
   const SUPA_KEY2 = 'sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B';
+
+  // ── Helpers (global — needed before initPortal runs) ─────
+  const fmtCur   = n => '₹' + Number(n||0).toLocaleString('en-IN');
+  const fmtDt    = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const initials = name => name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+  function gradeClass(g) {
+    if (!g) return 'b-gray';
+    const map = { O:'grade-o', 'A+':'grade-a', A:'grade-a', 'B+':'grade-b', B:'grade-b', C:'grade-c', D:'grade-d', F:'grade-f' };
+    return map[g] || 'b-gray';
+  }
+
+  // ── Tab switching — global so onclick="showTab(...)" works ─
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ── Logout — global ───────────────────────────────────────
+  function logout() {
+    sessionStorage.removeItem('cfms_auth');
+    window.location.replace('login.html');
+  }
+
+  // ── spData (populated by initPortal) ─────────────────────
+  let spData = null;
+  function getMyFeeStructure() {
+    if (!spData) return null;
+    const s = spData.student;
+    return spData.feeStructures.find(f => f.courseId === s.courseId && f.year === s.year);
+  }
+
+  // ── printReceipt — global so onclick in table works ───────
+  function printReceipt(paymentId) {
+    if (!spData) return;
+    const p = spData.payments.find(x => x.id === paymentId);
+    if (!p) return;
+    const s   = spData.student;
+    const c   = spData.courses.find(x => x.id === s.courseId);
+    const fs  = getMyFeeStructure();
+    const bal = p.amount - p.paidAmount;
+    const statusColor = p.status==='Paid'?'#16a34a':p.status==='Partial'?'#d97706':'#dc2626';
+    const statusBg    = p.status==='Paid'?'#dcfce7':p.status==='Partial'?'#fef3c7':'#fee2e2';
+    const win = window.open('','_blank','width=680,height=800');
+    win.document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Fee Receipt — ${p.receiptNo||'N/A'}</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;display:flex;justify-content:center;padding:30px 16px;color:#1e293b}.receipt{background:#fff;width:600px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.1);overflow:hidden}.rh{background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);color:#fff;padding:28px 32px 20px;position:relative}.rh .cn{font-size:1.15rem;font-weight:700}.rh .cs{font-size:.8rem;opacity:.85;margin-top:2px}.rh .rn{position:absolute;top:28px;right:32px;text-align:right}.rh .rn span{display:block;font-size:.7rem;opacity:.75;text-transform:uppercase;letter-spacing:.8px}.rh .rn strong{font-size:1.05rem}.sr{background:${statusBg};color:${statusColor};text-align:center;font-size:.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px}.rb{padding:28px 32px}.st{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;font-weight:600;margin-bottom:10px}.ig{display:grid;grid-template-columns:1fr 1fr;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:22px}.ic{padding:11px 14px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0}.ic:nth-child(even){border-right:none}.ic:nth-last-child(-n+2){border-bottom:none}.ic .l{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}.ic .v{font-size:.88rem;font-weight:600}.ft{width:100%;border-collapse:collapse;margin-bottom:22px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}.ft thead tr{background:#f8fafc}.ft th{padding:9px 14px;font-size:.72rem;text-transform:uppercase;color:#64748b;text-align:left;border-bottom:1px solid #e2e8f0}.ft th:last-child,.ft td:last-child{text-align:right}.ft td{padding:10px 14px;font-size:.88rem;color:#334155;border-bottom:1px solid #f1f5f9}.ft tr:last-child td{border-bottom:none}.ft .tr td{background:#eff6ff;font-weight:700;font-size:.95rem;color:#1d4ed8;border-top:2px solid #bfdbfe}.ft .br td{font-weight:700;color:${bal>0?'#dc2626':'#16a34a'}}.ss{display:flex;justify-content:space-between;padding:0 8px;margin-bottom:28px}.sb{text-align:center;width:30%}.sl{border-top:1px solid #cbd5e1;margin-bottom:6px;margin-top:44px}.sb span{font-size:.72rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px}.rf{background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;padding:12px;font-size:.72rem;color:#94a3b8}@media print{body{background:#fff;padding:0}.receipt{box-shadow:none;border-radius:0;width:100%}}</style>
+</head><body>
+<div class="receipt">
+<div class="rh"><div class="cn">🎓 Shanmuga Industries Arts and Science College</div><div class="cs">Official Fee Payment Receipt</div><div class="rn"><span>Receipt No.</span><strong>${p.receiptNo||'—'}</strong></div></div>
+<div class="sr">Payment Status: ${p.status||'—'}</div>
+<div class="rb">
+<div class="st">Student Information</div>
+<div class="ig">
+<div class="ic"><div class="l">Student Name</div><div class="v">${s?s.name:'—'}</div></div>
+<div class="ic"><div class="l">Roll Number</div><div class="v">${s?s.rollNo:'—'}</div></div>
+<div class="ic"><div class="l">Course</div><div class="v">${c?c.name:'—'}</div></div>
+<div class="ic"><div class="l">Year of Study</div><div class="v">${s?'Year '+s.year:'—'}</div></div>
+<div class="ic"><div class="l">Payment Date</div><div class="v">${p.paymentDate?new Date(p.paymentDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—'}</div></div>
+<div class="ic"><div class="l">Payment Method</div><div class="v">${p.method||'—'}</div></div>
+</div>
+<div class="st">Fee Details</div>
+<table class="ft"><thead><tr><th>Description</th><th>Amount</th></tr></thead><tbody>
+${fs?`<tr><td>Tuition Fee</td><td>₹${Number(fs.tuitionFee).toLocaleString('en-IN')}</td></tr><tr><td>Exam Fee</td><td>₹${Number(fs.examFee).toLocaleString('en-IN')}</td></tr><tr><td>Library Fee</td><td>₹${Number(fs.libraryFee).toLocaleString('en-IN')}</td></tr><tr><td>Lab Fee</td><td>₹${Number(fs.labFee).toLocaleString('en-IN')}</td></tr><tr><td>Other Fee</td><td>₹${Number(fs.otherFee).toLocaleString('en-IN')}</td></tr>`:''}
+<tr class="tr"><td>Total Fee</td><td>₹${Number(p.amount).toLocaleString('en-IN')}</td></tr>
+<tr><td>Amount Paid</td><td style="color:#16a34a;font-weight:700">₹${Number(p.paidAmount).toLocaleString('en-IN')}</td></tr>
+<tr class="br"><td>Balance Due</td><td>₹${Number(bal).toLocaleString('en-IN')}</td></tr>
+</tbody></table>
+${p.remark?`<div class="st">Remarks</div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:11px 14px;font-size:.83rem;color:#475569;margin-bottom:22px">${p.remark}</div>`:''}
+<div class="ss"><div class="sb"><div class="sl"></div><span>Student Signature</span></div><div class="sb"><div class="sl"></div><span>Accounts Officer</span></div><div class="sb"><div class="sl"></div><span>Principal</span></div></div>
+</div>
+<div class="rf">Computer-generated receipt. ${new Date().toLocaleString('en-IN')}</div>
+</div>
+<script>window.onload=()=>{window.print()}<\/script>
+</body></html>`);
+    win.document.close();
+  }
 
   async function spFetch(path) {
     try {
@@ -390,7 +468,7 @@
     return map[g] || 'b-gray';
   }
 
-  // ── Tab switching ─────────────────────────────────────────
+  // ── Tab switching — MUST be global (called from onclick in HTML) ──
   function showTab(id, btn) {
     document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -398,6 +476,7 @@
     btn.classList.add('active');
   }
 
+  // ── Logout — MUST be global ───────────────────────────────
   function logout() {
     sessionStorage.removeItem('cfms_auth');
     window.location.replace('login.html');
@@ -436,20 +515,41 @@
     const s = d.student;
     const c = d.courses.find(c => c.id === s.courseId);
 
-    // Stats
-    const totalFee  = d.payments.reduce((a,p)=>a+p.amount,0);
+    // Stats — use fee structure total as the "due" amount
+    const fs        = getMyFeeStructure ? getMyFeeStructure() : null;
+    const totalFee  = fs ? fs.total : d.payments.reduce((a,p)=>a+p.amount,0);
     const totalPaid = d.payments.reduce((a,p)=>a+p.paidAmount,0);
+    const balance   = totalFee - totalPaid;
     const overallAtt = d.attSummary.length
       ? Math.round(d.attSummary.reduce((a,x)=>a+x.pct,0)/d.attSummary.length)
       : null;
-    const passCount = d.results.filter(r=>r.result==='Pass').length;
 
     document.getElementById('home-stats').innerHTML = `
       <div class="stat-box box-blue"><div class="val">${d.subjects.filter(s2=>s2.courseId===s.courseId&&s2.year===s.year).length}</div><div class="lbl">Subjects</div></div>
       <div class="stat-box ${overallAtt===null?'box-blue':overallAtt>=75?'box-green':overallAtt>=60?'box-orange':'box-red'}">
         <div class="val">${overallAtt!==null?overallAtt+'%':'—'}</div><div class="lbl">Avg Attendance</div></div>
-      <div class="stat-box ${totalFee>0&&totalPaid>=totalFee?'box-green':'box-orange'}">
-        <div class="val">${fmtCur(totalPaid)}</div><div class="lbl">Fee Paid</div></div>`;
+      <div class="stat-box ${balance<=0&&totalFee>0?'box-green':'box-orange'}">
+        <div class="val">${fmtCur(totalPaid)}</div>
+        <div class="lbl">Fee Paid</div>
+        ${totalFee>0?`<div style="font-size:.68rem;opacity:.8">Due: ${fmtCur(balance)}</div>`:''}
+      </div>`;
+
+    // Quick overview
+    const attWarn  = d.attSummary.filter(a=>a.pct<75);
+    const failSubj = d.results.filter(r=>r.result==='Fail');
+    let quick = '';
+    if (attWarn.length)
+      quick += `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#92400e">
+        ⚠️ <strong>Low Attendance:</strong> ${attWarn.map(a=>a.subjectCode).join(', ')} — below 75%</div>`;
+    if (failSubj.length)
+      quick += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#991b1b">
+        ❌ <strong>Failed Subjects:</strong> ${failSubj.map(r=>r.subjectCode).join(', ')}</div>`;
+    if (balance > 0)
+      quick += `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#1e40af">
+        💰 <strong>Fee Balance Due:</strong> ${fmtCur(balance)} (Total: ${fmtCur(totalFee)})</div>`;
+    if (!quick)
+      quick = `<div style="text-align:center;padding:20px;color:#94a3b8">✅ Everything looks good!</div>`;
+    document.getElementById('home-quick').innerHTML = quick;
 
     // Info grid
     document.getElementById('sp-info-grid').innerHTML = `
@@ -463,23 +563,6 @@
       <div class="info-item"><div class="lbl">Admission Date</div><div class="val">${fmtDt(s.admissionDate)}</div></div>
       <div class="info-item"><div class="lbl">Address</div><div class="val">${s.address||'—'}</div></div>
       <div class="info-item"><div class="lbl">Status</div><div class="val">${s.status||'—'}</div></div>`;
-
-    // Quick overview
-    const attWarn = d.attSummary.filter(a=>a.pct<75);
-    const failSubj = d.results.filter(r=>r.result==='Fail');
-    let quick = '';
-    if (attWarn.length)
-      quick += `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#92400e">
-        ⚠️ <strong>Low Attendance:</strong> ${attWarn.map(a=>a.subjectCode).join(', ')} — attendance below 75%</div>`;
-    if (failSubj.length)
-      quick += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#991b1b">
-        ❌ <strong>Failed Subjects:</strong> ${failSubj.map(r=>r.subjectCode).join(', ')}</div>`;
-    if (totalFee > 0 && totalPaid < totalFee)
-      quick += `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:.85rem;color:#1e40af">
-        💰 <strong>Fee Balance:</strong> ${fmtCur(totalFee-totalPaid)} remaining</div>`;
-    if (!quick)
-      quick = `<div style="text-align:center;padding:20px;color:#94a3b8">✅ Everything looks good!</div>`;
-    document.getElementById('home-quick').innerHTML = quick;
   }
 
   // ── Courses ──────────────────────────────────────────────
@@ -634,6 +717,9 @@
   function renderFee(d) {
     const payments  = d.payments;
     const fs        = getMyFeeStructure();
+
+    // Total due = fee structure total (the actual fee charged by college)
+    // If no fee structure yet, fall back to sum of payment amounts
     const totalFee  = fs ? fs.total : payments.reduce((a,p)=>a+p.amount,0);
     const totalPaid = payments.reduce((a,p)=>a+p.paidAmount,0);
     const balance   = totalFee - totalPaid;
@@ -787,7 +873,8 @@
   function mR(r)  { return { id:r.id, studentId:r.student_id, semester:r.semester, subjectCode:r.subject_code, subjectName:r.subject_name, maxMarks:r.max_marks, cieMarks:r.cie_marks, seeMarks:r.see_marks, totalMarks:r.total_marks, grade:r.grade||'', result:r.result||'' }; }
   function mFS(r) { return { id:r.id, courseId:r.course_id, year:r.year, tuitionFee:r.tuition_fee, examFee:r.exam_fee, libraryFee:r.library_fee, labFee:r.lab_fee, otherFee:r.other_fee, total:r.total }; }
 
-  const spData = {
+  // Assign to module-level spData so global functions can access it
+  spData = {
     student:      mS(studentRow),
     courses:      rawCourses.map(mC),
     payments:     rawPayments.map(mP),
@@ -806,13 +893,7 @@
     results: rawResults.map(mR),
   };
 
-  // Helper — find fee structure for student's course+year
-  function getMyFeeStructure() {
-    const s = spData.student;
-    return spData.feeStructures.find(f => f.courseId === s.courseId && f.year === s.year);
-  }
-
-  // Override loadData to return Supabase data
+  // Override loadData to return spData
   function loadData() { return spData; }
 
   // Boot

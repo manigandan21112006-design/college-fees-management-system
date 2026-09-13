@@ -346,7 +346,8 @@
       e.preventDefault();
       const btn     = document.getElementById('student-login-btn');
       const errorEl = document.getElementById('error-msg');
-      const roll    = document.getElementById('student-roll').value.trim().toUpperCase();
+      // Keep original case — ilike handles case-insensitive match in DB
+      const roll    = document.getElementById('student-roll').value.trim();
       const day     = document.getElementById('dob-day').value;
       const month   = document.getElementById('dob-month').value;
       const year    = document.getElementById('dob-year').value;
@@ -363,9 +364,9 @@
       errorEl.classList.remove('show');
 
       try {
-        // Look up student in Supabase
+        // ilike = case-insensitive match so 1nc22cd046 and 1NC22CD046 both work
         const res = await fetch(
-          `https://sbbmcosqxjngmqnpgucw.supabase.co/rest/v1/students?roll_no=eq.${encodeURIComponent(roll)}&dob=eq.${dob}`,
+          `https://sbbmcosqxjngmqnpgucw.supabase.co/rest/v1/students?roll_no=ilike.${encodeURIComponent(roll)}&dob=eq.${dob}`,
           { headers: { 'apikey': 'sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B', 'Authorization': 'Bearer sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B' } }
         );
         const students = await res.json();

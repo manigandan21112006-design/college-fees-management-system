@@ -341,7 +341,7 @@
 
   // Fetch everything in parallel
   const [rawStudents, rawCourses, rawPayments, rawSubjects, rawTimetable, rawAttendance, rawResults] = await Promise.all([
-    spFetch(`students?roll_no=eq.${encodeURIComponent(auth.username)}`),
+    spFetch(`students?roll_no=ilike.${encodeURIComponent(auth.username)}`),
     spFetch('courses?order=id'),
     spFetch(`payments?student_id=eq.${auth.studentId}&order=id`),
     spFetch('course_subjects?order=id'),

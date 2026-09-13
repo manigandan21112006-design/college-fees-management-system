@@ -355,6 +355,10 @@
       <div class="card">
         <div class="card-header" style="flex-wrap:wrap;gap:12px">
           <h2>All Subjects</h2>
+          <div class="search-bar" style="min-width:240px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="subject-search" placeholder="Search by name, roll no, email…" />
+          </div>
           <div class="flex gap-2 flex-wrap" id="subject-filter-wrap"></div>
         </div>
         <div class="table-wrap">
@@ -375,6 +379,10 @@
       <div class="card">
         <div class="card-header" style="flex-wrap:wrap;gap:12px">
           <h2>Class Schedule</h2>
+          <div class="search-bar" style="min-width:240px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="tt-search" placeholder="Search by name, roll no, email…" />
+          </div>
           <div class="flex gap-2 flex-wrap">
             <select id="tt-filter-course" class="form-control" style="width:auto;padding:6px 10px;font-size:.85rem"></select>
             <select id="tt-filter-year"   class="form-control" style="width:auto;padding:6px 10px;font-size:.85rem">
@@ -397,6 +405,10 @@
       <div class="card" style="margin-bottom:20px">
         <div class="card-header" style="flex-wrap:wrap;gap:12px">
           <h2>Attendance Records</h2>
+          <div class="search-bar" style="min-width:240px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="att-search" placeholder="Search by name, roll no, email…" />
+          </div>
           <div class="flex gap-2 flex-wrap">
             <select id="att-filter-course" class="form-control" style="width:auto;padding:6px 10px;font-size:.85rem"></select>
             <select id="att-filter-student" class="form-control" style="width:auto;padding:6px 10px;font-size:.85rem"><option value="">All Students</option></select>
@@ -404,7 +416,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Student</th><th>Subject</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Roll No</th><th>Student</th><th>Subject</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="attendance-tbody"></tbody>
           </table>
         </div>
@@ -420,6 +432,10 @@
       <div class="card">
         <div class="card-header" style="flex-wrap:wrap;gap:12px">
           <h2>Results</h2>
+          <div class="search-bar" style="min-width:240px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="exam-search" placeholder="Search by name, roll no, email…" />
+          </div>
           <div class="flex gap-2 flex-wrap">
             <select id="exam-filter-student" class="form-control" style="width:auto;padding:6px 10px;font-size:.85rem"><option value="">All Students</option></select>
             <select id="exam-filter-sem" class="form-control" style="width:auto;padding:6px 10px;font-size:.85rem"><option value="">All Semesters</option></select>
@@ -427,7 +443,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Student</th><th>Semester</th><th>Subject Code</th><th>Subject</th><th>CIE</th><th>SEE</th><th>Total</th><th>Grade</th><th>Result</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Roll No</th><th>Student</th><th>Semester</th><th>Subject Code</th><th>Subject</th><th>CIE</th><th>SEE</th><th>Total</th><th>Grade</th><th>Result</th><th>Actions</th></tr></thead>
             <tbody id="exams-tbody"></tbody>
           </table>
         </div>

@@ -2,7 +2,8 @@
 //  Timetable Admin Page
 // ============================================================
 
-let editTimetableId = null;
+let editTimetableId  = null;
+let ttSearchQuery    = '';
 const DAYS_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 function renderTimetableAdmin() {
@@ -14,16 +15,36 @@ function renderTimetableAdmin() {
   sel.onchange = renderTimetableGrid;
   document.getElementById('tt-filter-year').onchange = renderTimetableGrid;
 
+  // Search input
+  const searchEl = document.getElementById('tt-search');
+  if (searchEl) {
+    const fresh = searchEl.cloneNode(true);
+    searchEl.parentNode.replaceChild(fresh, searchEl);
+    fresh.addEventListener('input', () => {
+      ttSearchQuery = fresh.value;
+      renderTimetableGrid();
+    });
+    fresh.value = ttSearchQuery;
+  }
+
   renderTimetableGrid();
 }
 
 function renderTimetableGrid() {
   const courseId = parseInt(document.getElementById('tt-filter-course').value) || null;
   const year     = parseInt(document.getElementById('tt-filter-year').value)   || null;
+  const q        = ttSearchQuery.toLowerCase().trim();
 
   let slots = DB.Timetable.all();
   if (courseId) slots = slots.filter(s => s.courseId === courseId);
   if (year)     slots = slots.filter(s => s.year === year);
+
+  if (q) {
+    slots = slots.filter(s =>
+      [s.subjectCode, s.subjectName, s.faculty, s.room, s.day, s.period]
+        .join(' ').toLowerCase().includes(q)
+    );
+  }
 
   const container = document.getElementById('timetable-grid');
 
@@ -32,14 +53,13 @@ function renderTimetableGrid() {
     return;
   }
 
-  // Group by day
   const byDay = {};
   DAYS_ORDER.forEach(d => { byDay[d] = []; });
   slots.forEach(s => { if (byDay[s.day]) byDay[s.day].push(s); else byDay[s.day] = [s]; });
 
   const courses = DB.Courses.all();
   container.innerHTML = DAYS_ORDER.filter(d => byDay[d].length).map(day => {
-    const daySlots = byDay[day].sort((a,b) => a.period.localeCompare(b.period));
+    const daySlots = byDay[day].sort((a, b) => a.period.localeCompare(b.period));
     return `
       <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#2563eb;margin-bottom:12px">${day}</div>
@@ -51,7 +71,7 @@ function renderTimetableGrid() {
               <div style="font-size:.75rem;color:#94a3b8;margin-bottom:4px">${s.period}</div>
               <div style="font-weight:700;color:#1e293b;font-size:.9rem;margin-bottom:2px">${s.subjectName}</div>
               <div style="font-size:.75rem;color:#2563eb;font-weight:600">${s.subjectCode}</div>
-              <div style="font-size:.75rem;color:#64748b;margin-top:4px">${s.faculty || ''} ${s.room ? '· '+s.room : ''}</div>
+              <div style="font-size:.75rem;color:#64748b;margin-top:4px">${s.faculty || ''} ${s.room ? '· ' + s.room : ''}</div>
               ${c ? `<div style="font-size:.7rem;color:#94a3b8;margin-top:2px">${c.name} · Year ${s.year}</div>` : ''}
               <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px">
                 <button class="btn btn-outline btn-sm" style="padding:2px 7px;font-size:.7rem" onclick="openEditTimetable(${s.id})">✏️</button>
@@ -78,8 +98,8 @@ function openEditTimetable(id) {
   editTimetableId = id;
   document.getElementById('timetable-modal-title').textContent = 'Edit Timetable Slot';
   populateTtCourseDropdown();
-  document.getElementById('tt-course').value  = t.courseId;
-  document.getElementById('tt-year').value    = t.year;
+  document.getElementById('tt-course').value = t.courseId;
+  document.getElementById('tt-year').value   = t.year;
   onTtCourseChange();
   setTimeout(() => {
     document.getElementById('tt-day').value     = t.day;
@@ -124,6 +144,7 @@ function saveTimetable() {
     room:        document.getElementById('tt-room').value.trim(),
     faculty:     document.getElementById('tt-faculty').value.trim(),
   };
+
   if (!data.period || !data.subjectCode) { toast('Please fill required fields.', 'error'); return; }
 
   if (editTimetableId) {

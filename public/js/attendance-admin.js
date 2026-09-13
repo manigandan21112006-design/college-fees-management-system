@@ -2,6 +2,8 @@
 //  Attendance Admin Page
 // ============================================================
 
+let attSearchQuery = '';
+
 function renderAttendanceAdmin() {
   const courses  = DB.Courses.all();
   const students = DB.Students.all();
@@ -14,10 +16,19 @@ function renderAttendanceAdmin() {
   // Student filter
   const studentSel = document.getElementById('att-filter-student');
   studentSel.innerHTML = '<option value="">All Students</option>' +
-    students.map(s => `<option value="${s.id}">${s.name} (${s.rollNo})</option>`).join('');
+    students.map(s => `<option value="${s.id}">${s.rollNo} — ${s.name}</option>`).join('');
 
   courseSel.onchange  = renderAttendanceRows;
   studentSel.onchange = renderAttendanceRows;
+
+  // Search input
+  const searchEl = document.getElementById('att-search');
+  if (searchEl) {
+    searchEl.addEventListener('input', () => {
+      attSearchQuery = searchEl.value;
+      renderAttendanceRows();
+    });
+  }
 
   renderAttendanceRows();
 }
@@ -25,33 +36,52 @@ function renderAttendanceAdmin() {
 function renderAttendanceRows() {
   const courseId  = parseInt(document.getElementById('att-filter-course').value)  || null;
   const studentId = parseInt(document.getElementById('att-filter-student').value) || null;
+  const q         = attSearchQuery.toLowerCase().trim();
 
-  let records  = DB.Attendance.all();
+  let records    = DB.Attendance.all();
   const students = DB.Students.all();
 
   if (courseId) {
-    const courseStudentIds = students.filter(s => s.courseId === courseId).map(s => s.id);
-    records = records.filter(r => courseStudentIds.includes(r.studentId));
+    const ids = students.filter(s => s.courseId === courseId).map(s => s.id);
+    records = records.filter(r => ids.includes(r.studentId));
   }
   if (studentId) records = records.filter(r => r.studentId === studentId);
 
+  // Text search
+  if (q) {
+    records = records.filter(r => {
+      const s = students.find(st => st.id === r.studentId);
+      const haystack = [
+        s ? s.name       : '',
+        s ? s.rollNo     : '',
+        s ? s.email      : '',
+        r.subjectCode,
+        r.subjectName,
+        r.status,
+        r.date,
+      ].join(' ').toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
   // Sort newest first
-  records = [...records].sort((a,b) => new Date(b.date) - new Date(a.date));
+  records = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const tbody = document.getElementById('attendance-tbody');
   if (!records.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📋</div><h3>No records found</h3></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📋</div><h3>No records found</h3></div></td></tr>`;
     return;
   }
 
   tbody.innerHTML = records.map(r => {
     const s = students.find(st => st.id === r.studentId);
-    const statusColor = r.status === 'Present' ? 'badge-success' : 'badge-danger';
+    const statusCls = r.status === 'Present' ? 'badge-success' : 'badge-danger';
     return `<tr>
-      <td><div class="fw-bold">${s ? s.name : '—'}</div><div class="text-muted" style="font-size:.75rem">${s ? s.rollNo : ''}</div></td>
+      <td><span class="badge badge-secondary" style="font-size:.8rem;font-weight:700">${s ? s.rollNo : '—'}</span></td>
+      <td><div class="fw-bold">${s ? s.name : '—'}</div></td>
       <td><span class="badge badge-info" style="font-size:.75rem">${r.subjectCode}</span> ${r.subjectName}</td>
       <td>${fmtDate(r.date)}</td>
-      <td><span class="badge ${statusColor}">${r.status}</span></td>
+      <td><span class="badge ${statusCls}">${r.status}</span></td>
       <td>
         <div class="flex gap-2">
           <button class="btn btn-outline btn-sm" onclick="toggleAttendance(${r.id})">${r.status === 'Present' ? 'Mark Absent' : 'Mark Present'}</button>
@@ -79,10 +109,10 @@ function deleteAttendanceRecord(id) {
 
 // ── Mark Attendance Modal ─────────────────────────────────
 function openMarkAttendance() {
-  const courses = DB.Courses.all();
+  const courses   = DB.Courses.all();
   const courseSel = document.getElementById('mark-att-course');
   courseSel.innerHTML = courses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-  document.getElementById('mark-att-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('mark-att-date').value = new Date().toISOString().slice(0, 10);
   onMarkAttCourseChange();
   openModal('attendance-modal');
 }
@@ -91,15 +121,13 @@ function onMarkAttCourseChange() {
   const courseId = parseInt(document.getElementById('mark-att-course').value);
   const year     = parseInt(document.getElementById('mark-att-year').value);
 
-  // Populate subject dropdown
   const subjects = DB.CourseSubjects.byCourseYear(courseId, year);
   const subSel   = document.getElementById('mark-att-subject');
   subSel.innerHTML = subjects.length
     ? subjects.map(s => `<option value="${s.code}|${s.name}">${s.code} — ${s.name}</option>`).join('')
     : '<option value="">No subjects</option>';
 
-  // Populate student list
-  const students = DB.Students.all().filter(s => s.courseId === courseId && s.year === year && s.status === 'Active');
+  const students  = DB.Students.all().filter(s => s.courseId === courseId && s.year === year && s.status === 'Active');
   const container = document.getElementById('mark-att-students');
 
   if (!students.length) {
@@ -117,9 +145,9 @@ function onMarkAttCourseChange() {
     </div>` +
     students.map(s => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;margin-bottom:4px;background:#f8fafc">
-        <div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="background:#dbeafe;color:#1d4ed8;font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px">${s.rollNo}</span>
           <span style="font-weight:600;font-size:.88rem">${s.name}</span>
-          <span style="color:#94a3b8;font-size:.75rem;margin-left:8px">${s.rollNo}</span>
         </div>
         <div style="display:flex;gap:6px">
           <label style="display:flex;align-items:center;gap:4px;font-size:.82rem;cursor:pointer;color:#16a34a;font-weight:600">

@@ -2,13 +2,14 @@
 //  Subjects Admin Page
 // ============================================================
 
-let editSubjectId = null;
+let editSubjectId   = null;
+let subjectSearchQuery = '';
+let subjectFilterCid   = null;
 
 function renderSubjects() {
-  const subjects = DB.CourseSubjects.all();
-  const courses  = DB.Courses.all();
+  const courses = DB.Courses.all();
 
-  // Build course filter buttons
+  // Course filter buttons
   const filterWrap = document.getElementById('subject-filter-wrap');
   filterWrap.innerHTML =
     `<button class="btn btn-primary btn-sm subj-filter" data-cid="all">All</button>` +
@@ -16,21 +17,46 @@ function renderSubjects() {
 
   filterWrap.querySelectorAll('.subj-filter').forEach(btn => {
     btn.addEventListener('click', () => {
-      filterWrap.querySelectorAll('.subj-filter').forEach(b => b.classList.replace('btn-primary','btn-outline'));
-      btn.classList.replace('btn-outline','btn-primary');
-      renderSubjectRows(btn.dataset.cid === 'all' ? null : parseInt(btn.dataset.cid));
+      filterWrap.querySelectorAll('.subj-filter').forEach(b => b.classList.replace('btn-primary', 'btn-outline'));
+      btn.classList.replace('btn-outline', 'btn-primary');
+      subjectFilterCid = btn.dataset.cid === 'all' ? null : parseInt(btn.dataset.cid);
+      renderSubjectRows();
     });
   });
 
-  renderSubjectRows(null);
+  // Search input
+  const searchEl = document.getElementById('subject-search');
+  if (searchEl) {
+    // Remove old listener by cloning
+    const fresh = searchEl.cloneNode(true);
+    searchEl.parentNode.replaceChild(fresh, searchEl);
+    fresh.addEventListener('input', () => {
+      subjectSearchQuery = fresh.value;
+      renderSubjectRows();
+    });
+    fresh.value = subjectSearchQuery;
+  }
+
+  renderSubjectRows();
 }
 
-function renderSubjectRows(filterCourseId) {
+function renderSubjectRows() {
   const subjects = DB.CourseSubjects.all();
   const courses  = DB.Courses.all();
-  const filtered = filterCourseId ? subjects.filter(s => s.courseId === filterCourseId) : subjects;
-  const tbody    = document.getElementById('subjects-tbody');
+  const q        = subjectSearchQuery.toLowerCase().trim();
 
+  let filtered = subjectFilterCid
+    ? subjects.filter(s => s.courseId === subjectFilterCid)
+    : subjects;
+
+  if (q) {
+    filtered = filtered.filter(s => {
+      const c = courses.find(c => c.id === s.courseId);
+      return [s.code, s.name, c ? c.name : ''].join(' ').toLowerCase().includes(q);
+    });
+  }
+
+  const tbody = document.getElementById('subjects-tbody');
   if (!filtered.length) {
     tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📚</div><h3>No subjects found</h3></div></td></tr>`;
     return;
@@ -39,7 +65,7 @@ function renderSubjectRows(filterCourseId) {
   tbody.innerHTML = filtered.map(s => {
     const c = courses.find(c => c.id === s.courseId);
     return `<tr>
-      <td><span class="badge badge-info" style="font-size:.8rem">${s.code}</span></td>
+      <td><span class="badge badge-info" style="font-size:.8rem;font-weight:700">${s.code}</span></td>
       <td class="fw-bold">${s.name}</td>
       <td>${c ? c.name : '—'}</td>
       <td>Year ${s.year}</td>

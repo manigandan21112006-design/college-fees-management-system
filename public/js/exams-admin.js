@@ -3,17 +3,18 @@
 // ============================================================
 
 let editResultId = null;
+let examSearchQuery = '';
 
 function renderExamsAdmin() {
   const students = DB.Students.all();
   const results  = DB.ExamResults.all();
 
-  // Student filter dropdown
+  // Student dropdown
   const studentSel = document.getElementById('exam-filter-student');
   studentSel.innerHTML = '<option value="">All Students</option>' +
     students.map(s => `<option value="${s.id}">${s.name} (${s.rollNo})</option>`).join('');
 
-  // Semester filter
+  // Semester dropdown
   const sems = [...new Set(results.map(r => r.semester))].sort();
   const semSel = document.getElementById('exam-filter-sem');
   semSel.innerHTML = '<option value="">All Semesters</option>' +
@@ -22,31 +23,60 @@ function renderExamsAdmin() {
   studentSel.onchange = renderExamRows;
   semSel.onchange     = renderExamRows;
 
+  // Search input
+  const searchEl = document.getElementById('exam-search');
+  if (searchEl) {
+    searchEl.addEventListener('input', () => {
+      examSearchQuery = searchEl.value;
+      renderExamRows();
+    });
+  }
+
   renderExamRows();
 }
 
 function renderExamRows() {
   const studentId = parseInt(document.getElementById('exam-filter-student').value) || null;
   const sem       = document.getElementById('exam-filter-sem').value;
+  const q         = examSearchQuery.toLowerCase().trim();
 
-  let results  = DB.ExamResults.all();
+  let results    = DB.ExamResults.all();
   const students = DB.Students.all();
 
   if (studentId) results = results.filter(r => r.studentId === studentId);
   if (sem)       results = results.filter(r => r.semester === sem);
 
+  // Text search across name, roll no, subject code, subject name
+  if (q) {
+    results = results.filter(r => {
+      const s = students.find(st => st.id === r.studentId);
+      const haystack = [
+        s ? s.name    : '',
+        s ? s.rollNo  : '',
+        s ? s.email   : '',
+        r.subjectCode,
+        r.subjectName,
+        r.semester,
+        r.grade,
+        r.result,
+      ].join(' ').toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
   const tbody = document.getElementById('exams-tbody');
   if (!results.length) {
-    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📝</div><h3>No results found</h3></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">📝</div><h3>No results found</h3></div></td></tr>`;
     return;
   }
 
   tbody.innerHTML = results.map(r => {
     const s = students.find(st => st.id === r.studentId);
-    const gradeCls = r.grade === 'F' ? 'badge-danger' : r.grade === 'O' ? 'badge-success' : r.grade === 'A' || r.grade === 'A+' ? 'badge-success' : 'badge-warning';
+    const gradeCls  = r.grade === 'F' ? 'badge-danger' : (r.grade === 'O' || r.grade === 'A' || r.grade === 'A+') ? 'badge-success' : 'badge-warning';
     const resultCls = r.result === 'Pass' ? 'badge-success' : 'badge-danger';
     return `<tr>
-      <td><div class="fw-bold">${s ? s.name : '—'}</div><div class="text-muted" style="font-size:.75rem">${s ? s.rollNo : ''}</div></td>
+      <td><span class="badge badge-secondary" style="font-size:.8rem;font-weight:700">${s ? s.rollNo : '—'}</span></td>
+      <td><div class="fw-bold">${s ? s.name : '—'}</div></td>
       <td>${r.semester}</td>
       <td><span class="badge badge-info" style="font-size:.75rem">${r.subjectCode}</span></td>
       <td>${r.subjectName}</td>
@@ -95,13 +125,12 @@ function populateResultStudentDropdown() {
   const sel = document.getElementById('result-student');
   sel.innerHTML = '<option value="">Select Student</option>' +
     DB.Students.all().filter(s => s.status === 'Active').map(s =>
-      `<option value="${s.id}">${s.name} (${s.rollNo})</option>`
+      `<option value="${s.id}">${s.rollNo} — ${s.name}</option>`
     ).join('');
 }
 
 function autoGrade(cie, see, max) {
-  const total = cie + see;
-  const pct   = (total / max) * 100;
+  const pct = ((cie + see) / max) * 100;
   if (pct >= 90) return { grade: 'O',  result: 'Pass' };
   if (pct >= 80) return { grade: 'A+', result: 'Pass' };
   if (pct >= 70) return { grade: 'A',  result: 'Pass' };
@@ -113,11 +142,11 @@ function autoGrade(cie, see, max) {
 }
 
 function saveResult() {
-  const cieMarks = parseFloat(document.getElementById('result-cie').value) || 0;
-  const seeMarks = parseFloat(document.getElementById('result-see').value) || 0;
-  const maxMarks = parseFloat(document.getElementById('result-max').value) || 100;
+  const cieMarks      = parseFloat(document.getElementById('result-cie').value) || 0;
+  const seeMarks      = parseFloat(document.getElementById('result-see').value) || 0;
+  const maxMarks      = parseFloat(document.getElementById('result-max').value) || 100;
   const gradeOverride = document.getElementById('result-grade').value;
-  const auto = autoGrade(cieMarks, seeMarks, maxMarks);
+  const auto          = autoGrade(cieMarks, seeMarks, maxMarks);
 
   const data = {
     studentId:   parseInt(document.getElementById('result-student').value),

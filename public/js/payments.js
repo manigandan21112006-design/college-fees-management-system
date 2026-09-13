@@ -52,9 +52,9 @@ function renderPayments() {
     const balance = p.amount - p.paidAmount;
     return `<tr>
       <td>${p.receiptNo || '—'}</td>
+      <td><span class="badge badge-secondary" style="font-size:.8rem;font-weight:700;letter-spacing:.3px">${s ? s.rollNo : '—'}</span></td>
       <td>
         <div class="fw-bold">${s ? s.name : '—'}</div>
-        <div class="text-muted" style="font-size:.75rem">${s ? s.rollNo : ''}</div>
       </td>
       <td>${c ? c.name : '—'}<br><small class="text-muted">${s ? 'Year ' + s.year : ''}</small></td>
       <td>${fmtCurrency(p.amount)}</td>

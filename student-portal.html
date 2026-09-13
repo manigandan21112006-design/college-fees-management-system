@@ -285,6 +285,9 @@
   <div class="tab-section" id="tab-fee">
     <div class="stat-row" id="fee-stats"></div>
 
+    <!-- Itemised fee structure breakdown -->
+    <div id="fee-breakdown"></div>
+
     <div class="card">
       <div class="card-header">
         <h3>Payment Progress</h3>
@@ -360,14 +363,18 @@
     auth.studentId = studentId;
     sessionStorage.setItem('cfms_auth', JSON.stringify(auth));
 
-    // Fetch everything else in parallel using the confirmed studentId
-    const [rawCourses, rawPayments, rawSubjects, rawTimetable, rawAttendance, rawResults] = await Promise.all([
+    // Fetch everything else in parallel — filter by courseId for efficiency
+    const courseId = studentRow.course_id;
+    const year     = studentRow.year;
+
+    const [rawCourses, rawPayments, rawFees, rawSubjects, rawTimetable, rawAttendance, rawResults] = await Promise.all([
       spFetch('courses?order=id'),
       spFetch(`payments?student_id=eq.${studentId}&order=id`),
-      spFetch('course_subjects?order=id'),
-      spFetch('timetable?order=id'),
-      spFetch(`attendance?student_id=eq.${studentId}&order=id`),
-      spFetch(`exam_results?student_id=eq.${studentId}&order=id`),
+      spFetch(`fee_structures?course_id=eq.${courseId}&order=year`),
+      spFetch(`course_subjects?course_id=eq.${courseId}&order=year,id`),
+      spFetch(`timetable?course_id=eq.${courseId}&year=eq.${year}&order=day,period`),
+      spFetch(`attendance?student_id=eq.${studentId}&order=date.desc`),
+      spFetch(`exam_results?student_id=eq.${studentId}&order=semester,id`),
     ]);
 
     document.getElementById('sp-loading')?.remove();
@@ -626,7 +633,8 @@
   // ── Fee ──────────────────────────────────────────────────
   function renderFee(d) {
     const payments  = d.payments;
-    const totalFee  = payments.reduce((a,p)=>a+p.amount,0);
+    const fs        = getMyFeeStructure();
+    const totalFee  = fs ? fs.total : payments.reduce((a,p)=>a+p.amount,0);
     const totalPaid = payments.reduce((a,p)=>a+p.paidAmount,0);
     const balance   = totalFee - totalPaid;
     const pct       = totalFee > 0 ? Math.round((totalPaid/totalFee)*100) : 0;
@@ -639,6 +647,26 @@
     document.getElementById('fee-pct').textContent       = pct + '%';
     document.getElementById('fee-prog-fill').style.width = pct + '%';
     document.getElementById('fee-prog-detail').textContent = fmtCur(totalPaid) + ' of ' + fmtCur(totalFee);
+
+    // Show fee structure breakdown if available
+    const breakdownEl = document.getElementById('fee-breakdown');
+    if (breakdownEl && fs) {
+      breakdownEl.innerHTML = `
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-header"><h3>Fee Structure Breakdown</h3></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;font-size:.88rem">
+              <span style="color:#64748b">Tuition Fee</span>  <span style="font-weight:600;text-align:right">${fmtCur(fs.tuitionFee)}</span>
+              <span style="color:#64748b">Exam Fee</span>     <span style="font-weight:600;text-align:right">${fmtCur(fs.examFee)}</span>
+              <span style="color:#64748b">Library Fee</span>  <span style="font-weight:600;text-align:right">${fmtCur(fs.libraryFee)}</span>
+              <span style="color:#64748b">Lab Fee</span>      <span style="font-weight:600;text-align:right">${fmtCur(fs.labFee)}</span>
+              <span style="color:#64748b">Other Fee</span>    <span style="font-weight:600;text-align:right">${fmtCur(fs.otherFee)}</span>
+              <span style="font-weight:800;color:#1d4ed8;border-top:1px solid #e2e8f0;padding-top:8px">Total Annual Fee</span>
+              <span style="font-weight:800;color:#1d4ed8;border-top:1px solid #e2e8f0;padding-top:8px;text-align:right">${fmtCur(fs.total)}</span>
+            </div>
+          </div>
+        </div>`;
+    }
 
     const wrap = document.getElementById('fee-history-wrap');
     if (!payments.length) return;
@@ -669,10 +697,12 @@
 
   // ── Print Receipt ─────────────────────────────────────────
   function printReceipt(paymentId) {
-    const p = DB.Payments.get(paymentId);
+    // Use spData — NOT DB cache (which isn't loaded in the portal)
+    const p = spData.payments.find(x => x.id === paymentId);
     if (!p) return;
-    const s   = DB.Students.get(p.studentId);
-    const c   = s ? DB.Courses.get(s.courseId) : null;
+    const s   = spData.student;
+    const c   = spData.courses.find(x => x.id === s.courseId);
+    const fs  = getMyFeeStructure();
     const bal = p.amount - p.paidAmount;
     const statusColor = p.status==='Paid'?'#16a34a':p.status==='Partial'?'#d97706':'#dc2626';
     const statusBg    = p.status==='Paid'?'#dcfce7':p.status==='Partial'?'#fef3c7':'#fee2e2';
@@ -755,14 +785,16 @@
   function mT(r)  { return { id:r.id, courseId:r.course_id, year:r.year, day:r.day, period:r.period, subjectCode:r.subject_code, subjectName:r.subject_name, room:r.room||'', faculty:r.faculty||'' }; }
   function mA(r)  { return { id:r.id, studentId:r.student_id, subjectCode:r.subject_code, subjectName:r.subject_name, date:r.date, status:r.status }; }
   function mR(r)  { return { id:r.id, studentId:r.student_id, semester:r.semester, subjectCode:r.subject_code, subjectName:r.subject_name, maxMarks:r.max_marks, cieMarks:r.cie_marks, seeMarks:r.see_marks, totalMarks:r.total_marks, grade:r.grade||'', result:r.result||'' }; }
+  function mFS(r) { return { id:r.id, courseId:r.course_id, year:r.year, tuitionFee:r.tuition_fee, examFee:r.exam_fee, libraryFee:r.library_fee, labFee:r.lab_fee, otherFee:r.other_fee, total:r.total }; }
 
   const spData = {
-    student:    mS(studentRow),
-    courses:    rawCourses.map(mC),
-    payments:   rawPayments.map(mP),
-    subjects:   rawSubjects.map(mSb),
-    timetable:  rawTimetable.map(mT),
-    attAll:     rawAttendance.map(mA),
+    student:      mS(studentRow),
+    courses:      rawCourses.map(mC),
+    payments:     rawPayments.map(mP),
+    feeStructures:rawFees.map(mFS),
+    subjects:     rawSubjects.map(mSb),
+    timetable:    rawTimetable.map(mT),
+    attAll:       rawAttendance.map(mA),
     attSummary: (() => {
       const map = {};
       rawAttendance.forEach(r => {
@@ -773,6 +805,12 @@
     })(),
     results: rawResults.map(mR),
   };
+
+  // Helper — find fee structure for student's course+year
+  function getMyFeeStructure() {
+    const s = spData.student;
+    return spData.feeStructures.find(f => f.courseId === s.courseId && f.year === s.year);
+  }
 
   // Override loadData to return Supabase data
   function loadData() { return spData; }

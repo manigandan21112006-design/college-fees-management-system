@@ -80,15 +80,15 @@ function renderPayments() {
 }
 
 // ── Add / Edit ───────────────────────────────────────────────
-function openAddPayment() {
+async function openAddPayment() {
   editPaymentId = null;
   document.getElementById('payment-modal-title').textContent = 'Record New Payment';
   document.getElementById('payment-form').reset();
   document.getElementById('payment-date').value = new Date().toISOString().slice(0,10);
-
-  // populate student dropdown
+  const fi = document.getElementById('payment-fee-info');
+  if (fi) fi.innerHTML = '';
   populatePaymentStudentDropdown();
-  generateReceiptNo();
+  await generateReceiptNo();
   openModal('payment-modal');
 }
 
@@ -121,19 +121,72 @@ function populatePaymentStudentDropdown() {
 
 function onPaymentStudentChange() {
   const studentId = parseInt(document.getElementById('payment-student').value);
-  if (!studentId) return;
-  const s = DB.Students.get(studentId);
+  const feeInfo   = document.getElementById('payment-fee-info');
+
+  if (!studentId) {
+    if (feeInfo) feeInfo.innerHTML = '';
+    return;
+  }
+
+  const s  = DB.Students.get(studentId);
   if (!s) return;
-  const fs = DB.FeeStructures.byCourseYear(s.courseId, s.year);
+
+  const course = DB.Courses.get(s.courseId);
+  const fs     = DB.FeeStructures.byCourseYear(s.courseId, s.year);
+
   if (fs && !editPaymentId) {
     document.getElementById('payment-amount').value = fs.total;
   }
+
+  // Show itemised fee breakdown below the student dropdown
+  if (feeInfo) {
+    if (!fs) {
+      feeInfo.innerHTML = `
+        <div style="background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:8px 12px;font-size:.8rem;color:#92400e;margin-top:6px">
+          ⚠️ No fee structure for <strong>${course ? course.name : ''} Year ${s.year}</strong>. Please add it in Fee Structure first.
+        </div>`;
+    } else {
+      // Check existing payments for this student
+      const existing     = DB.Payments.byStudent(studentId);
+      const totalPaid    = existing.reduce((a, p) => a + p.paidAmount, 0);
+      const totalBalance = fs.total - totalPaid;
+
+      feeInfo.innerHTML = `
+        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px 14px;margin-top:8px;font-size:.82rem">
+          <div style="font-weight:700;color:#0369a1;margin-bottom:6px">
+            ${course ? course.name : ''} · Year ${s.year} · ${s.rollNo}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr auto;gap:2px 10px;color:#374151">
+            <span>Tuition</span><span style="font-weight:600">₹${Number(fs.tuitionFee).toLocaleString('en-IN')}</span>
+            <span>Exam</span><span style="font-weight:600">₹${Number(fs.examFee).toLocaleString('en-IN')}</span>
+            <span>Library</span><span style="font-weight:600">₹${Number(fs.libraryFee).toLocaleString('en-IN')}</span>
+            <span>Lab</span><span style="font-weight:600">₹${Number(fs.labFee).toLocaleString('en-IN')}</span>
+            <span>Other</span><span style="font-weight:600">₹${Number(fs.otherFee).toLocaleString('en-IN')}</span>
+            <span style="font-weight:700;color:#0369a1">Total Fee</span><span style="font-weight:800;color:#0369a1">₹${Number(fs.total).toLocaleString('en-IN')}</span>
+          </div>
+          ${existing.length ? `
+          <div style="margin-top:8px;padding-top:6px;border-top:1px solid #bae6fd;display:flex;justify-content:space-between;font-size:.8rem">
+            <span>Already Paid: <strong style="color:#16a34a">₹${Number(totalPaid).toLocaleString('en-IN')}</strong></span>
+            <span>Remaining: <strong style="color:${totalBalance > 0 ? '#dc2626':'#16a34a'}">₹${Number(totalBalance).toLocaleString('en-IN')}</strong></span>
+          </div>` : ''}
+        </div>`;
+    }
+  }
 }
 
-function generateReceiptNo() {
+async function generateReceiptNo() {
+  // Get highest receipt number from DB to avoid collisions
+  try {
+    const rows = await sbFetch('payments?select=receipt_no&receipt_no=not.is.null&order=id.desc&limit=1');
+    if (rows && rows.length > 0 && rows[0].receipt_no) {
+      const last = rows[0].receipt_no;
+      const num  = parseInt(last.replace(/\D/g, '')) || 0;
+      document.getElementById('payment-receipt').value = 'RCP' + String(num + 1).padStart(3, '0');
+      return;
+    }
+  } catch(e) { /* fallback below */ }
   const payments = DB.Payments.all();
-  const num = payments.length + 1;
-  document.getElementById('payment-receipt').value = 'RCP' + String(num).padStart(3, '0');
+  document.getElementById('payment-receipt').value = 'RCP' + String(payments.length + 1).padStart(3, '0');
 }
 
 async function savePayment() {

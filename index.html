@@ -520,6 +520,8 @@
           <label>Address</label>
           <input id="student-address" class="form-control" placeholder="City / Address" />
         </div>
+        <!-- Dynamic fee preview — updates when course or year changes -->
+        <div id="student-fee-preview" style="grid-column:1/-1"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline" onclick="closeModal('student-modal')">Cancel</button>
@@ -641,6 +643,8 @@
         <div class="form-group" style="grid-column:1/-1">
           <label>Student *</label>
           <select id="payment-student" class="form-control"></select>
+          <!-- Dynamic fee info — auto-populates when student selected -->
+          <div id="payment-fee-info"></div>
         </div>
         <div class="form-group">
           <label>Fee Amount (₹) *</label>

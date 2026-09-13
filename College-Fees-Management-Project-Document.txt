@@ -1,0 +1,1260 @@
+================================================================================
+         COLLEGE FEES MANAGEMENT SYSTEM
+         Project work submitted in partial fulfillment of the
+         requirements for the degree of
+         MASTER OF SCIENCE IN COMPUTER SCIENCE
+
+                          By
+                     MANIGANDAN S
+              REG NO: 20924P15013
+
+                  Under the Guidance of
+              Dr. L. SAMUVEL M.Sc., B.Ed.,
+                   Assistant Professor
+         PG & Research Department of Computer Science
+
+    SHANMUGA INDUSTRIES ARTS AND SCIENCE COLLEGE (Co-Ed.,)
+         Accredited with "B+" GRADE By NAAC in Cycle1
+  Certified Under Section 2(f) & 12 Both the UGC Act 1956
+          (An ISO 9001:2015 Certified Institution)
+  Permanently Affiliated to Thiruvalluvar University, Vellore
+        and Approved by the Government of Tamil Nadu & AICTE
+        Manalurpet Road, Tiruvannamalai - 606603.
+
+                         March - 2026
+================================================================================
+
+
+================================================================================
+                        MAIN PROJECT WORK
+              COLLEGE FEES MANAGEMENT SYSTEM
+                       Bonafide Work Done
+                              By
+                       MANIGANDAN S
+                 REG NO: 20924P15013
+
+  Project work submitted in partial fulfillment of the requirement
+       for the degree of MASTER OF SCIENCE IN COMPUTER SCIENCE
+
+                             To the
+    SHANMUGA INDUSTRIES ARTS AND SCIENCE COLLEGE (Co-Ed.,)
+         Accredited with "B+" GRADE By NAAC in Cycle1
+  Certified Under Section 2(f) & 12B of the UGC Act 1956
+          (An ISO 9001:2015 Certified Institution)
+  Permanently Affiliated to Thiruvalluvar University, Vellore
+        and Approved by the Government of Tamil Nadu & AICTE
+        Manalurpet Road, Tiruvannamalai - 606603.
+
+  INTERNAL GUIDE                        HEAD OF THE DEPARTMENT
+
+  Submitted for the Viva-Voice Examination held on _______________
+
+  External Examiner                     External Examiner
+================================================================================
+
+
+================================================================================
+                           DECLARATION
+================================================================================
+
+I am MANIGANDAN S, I hereby sincerely declare that the project work,
+entitled as "COLLEGE FEES MANAGEMENT SYSTEM" submitted to
+Thiruvalluvar University, in partial fulfillment of the requirements
+for the award of the Degree of Master of Science in Computer Science
+is a record of original and independent project work done by me during
+DEC 2025 - MAR 2026 under the supervision and guidance of
+Dr. L. SAMUVEL, M.Sc., B.Ed., Assistant Professor and PG & Research
+Department of Computer Science, Shanmuga Industries Arts and Science
+College, Tiruvannamalai and it has not formed the basis for the award
+of any Degree / Diploma / Associateship / Fellowship or other similar
+title to any Candidate in any University.
+
+Internal Guide                          Signature of the Candidate
+
+
+================================================================================
+                         ACKNOWLEDGEMENT
+================================================================================
+
+I wish to acknowledge my indebtedness and deep sense of gratitude to
+the Honourable Secretary and Correspondent Mr. N. KUMAR, B.E., and
+the Treasurer Mr. L. VIJAY ANAND, B.com., Shanmuga Industries Arts
+and Science College, Tiruvannamalai.
+
+I express my gratitude to Dr. K. ANANDARAJ, M.Sc., M.Phil., Ph.D.,
+Principal, for his constant support and motivation throughout the
+project.
+
+I am obliged and deeply indebted to sincerely thank
+Dr. D. SENTHIL KUMAR, M.Sc., M.Phil., B.Ed., NET., Director,
+Associate Professor & Head, PG & Research Department of Computer
+Science, who helped me to complete my project successfully.
+
+I am thankful to my Guide Dr. L. SAMUVEL M.Sc., B.Ed.,
+Associate Professor, PG & Research Department of Computer Science,
+to guide me to complete the dissertation successfully. I am grateful
+to him for his encouragement, invaluable guidance throughout my project.
+
+I also thank all staff members of our Department who had helped me in
+successful completion of this project.
+
+                                                          MANIGANDAN S
+
+
+================================================================================
+                             ABSTRACT
+================================================================================
+
+The College Fees Management System is an intelligent web-based system
+designed to streamline the process of managing student fee records,
+attendance, timetables, exam results, and academic details for
+educational institutions. By integrating HTML5, CSS3, Vanilla
+JavaScript, Supabase (PostgreSQL), and Vercel deployment, the system
+efficiently manages both administrative and student-facing operations.
+
+The process begins with role-based authentication, allowing Admin/Staff
+to manage all academic and financial records, while Students can log in
+using their Roll Number and Date of Birth to view their personal
+academic portal.
+
+Administrators can manage students, fee structures, payments, subjects,
+timetable, attendance, and exam results. Students can view their fee
+status, payment receipts, attendance graph, timetable, exam results,
+and registered courses through a dedicated 6-tab student portal.
+
+This project enhances efficiency by automating fee tracking and
+academic record management, reducing educators' workload while
+maintaining quality and security. With Supabase backend storage, data
+is persisted across all devices and accessible from anywhere in the
+world through the Vercel deployment.
+
+
+================================================================================
+                         TABLE OF CONTENTS
+================================================================================
+
+CHAPTER NO     TITLE                                           PAGE NO
+------------------------------------------------------------------------
+1              CHAPTER - 1                                      01 - 02
+               INTRODUCTION
+               1.1  Overview of the Project                        01
+               1.2  Literature Review                              02
+
+2              CHAPTER - 2                                      03 - 09
+               SYSTEM REQUIREMENTS
+               2.1  Hardware Requirements                          03
+               2.2  Software Requirements                          04
+               2.3  Software Dependencies                       05 - 07
+               2.4  Existing System                                08
+               2.5  Proposed System                                08
+               2.6  Development Tools and Technologies             08
+               2.7  Features of Proposed System                    07
+               2.8  Advantages                                     07
+               2.9  Disadvantages                                  09
+
+3              CHAPTER - 3                                      10 - 12
+               DESIGN AND DEVELOPMENT
+               3.1  Data Flow Diagram                           10 - 11
+               3.2  Module Description                             12
+
+4              CHAPTER - 4                                      13 - 47
+               IMPLEMENTATION
+               4.1  Overview of Implementation                     13
+               4.2  Step-by-Step Implementation                 14 - 16
+               4.3  Overview of API (Supabase)                  17 - 20
+               4.4  Source Code                                 21 - 41
+               4.5  Output Screenshots                          42 - 47
+
+5              CHAPTER - 5                                      48 - 49
+               FUTURE SCOPE & CONCLUSION
+               5.1  Future Scope                                   48
+               5.2  Conclusion                                     49
+
+               REFERENCES                                          50
+
+
+================================================================================
+                         CHAPTER 1
+                       INTRODUCTION
+================================================================================
+
+1.1 OVERVIEW OF THE PROJECT
+-----------------------------
+
+The College Fees Management System is a full-stack web application
+with role-based authentication (Admin/Student), Supabase PostgreSQL
+database, and a fully responsive UI built with HTML5, CSS3, and
+Vanilla JavaScript. The system automates the process of managing
+student records, fee structures, payments, attendance, timetables,
+exam results, and course subjects.
+
+This project includes an Admin Panel where staff can manage all
+academic and financial records, and a Student Portal where students
+can view their personalized academic dashboard using their Roll Number
+and Date of Birth.
+
+The system follows a structured college management format, making it
+highly efficient for academic institutions. With cloud-based storage
+(Supabase) and global deployment (Vercel), this project ensures
+data is available from any device, anywhere in the world.
+
+1.1.1 OBJECTIVES
+-----------------
+
+1.  Student Records Management:
+    o   Add, edit, delete student records with full details.
+    o   Map each student to a course, year, and fee structure.
+
+2.  Fee Structure & Payments:
+    o   Define course-wise and year-wise fee structures.
+    o   Record and track student payments with receipt generation.
+
+3.  Database Integration:
+    o   Store all data in Supabase (PostgreSQL cloud database).
+    o   Enable quick retrieval and modification from any device.
+
+4.  Admin Control & Management:
+    o   9-page admin panel to manage all academic records.
+    o   Mark attendance, publish exam results, manage timetable.
+
+5.  Student Portal:
+    o   6-tab student portal (Home, Courses, Attendance,
+        Timetable, Exam Results, Fee).
+    o   Login with Roll Number + Date of Birth.
+
+
+1.1.2 SCOPE OF THE PROJECT
+---------------------------
+
+6.  Admin Module:
+    o   Dashboard with stats, charts, and collection summary.
+    o   Manage Students, Fee Structures, Payments, Reports.
+    o   Manage Subjects, Timetable, Attendance, Exam Results.
+
+7.  Student Module:
+    o   Login using Roll Number and Date of Birth.
+    o   View personal fee status, attendance %, exam results.
+    o   View registered subjects with codes, timetable slots.
+
+8.  Database (Supabase - PostgreSQL):
+    o   Store students, courses, fee structures, payments.
+    o   Store course subjects, timetable, attendance, exam results.
+
+9.  Payment & Receipt System:
+    o   Auto-fill fee amount based on course+year mapping.
+    o   Print-ready official fee receipts with college branding.
+
+10. Export & Reports:
+    o   Download Students CSV, Payments CSV.
+    o   Course-wise collection reports, defaulters list.
+
+
+1.2 LITERATURE REVIEW
+----------------------
+
+1.  Web-Based Management Systems: HTML5, CSS3, and JavaScript-based
+    systems have proven effective for building responsive, cross-
+    device educational management platforms without heavy frameworks.
+
+2.  Cloud Databases: Supabase (PostgreSQL) provides free-tier cloud
+    database hosting with RESTful API access, eliminating the need
+    for a dedicated backend server while ensuring data persistence.
+
+3.  Role-Based Access Control: Modern web applications use
+    sessionStorage-based authentication to differentiate Admin and
+    Student access, providing secure but lightweight authorization.
+
+4.  Fee Management Automation: Digital fee management systems reduce
+    manual errors in fee collection, provide real-time balance
+    tracking, and generate instant receipts for students.
+
+
+================================================================================
+                         CHAPTER 2
+                    SYSTEM REQUIREMENTS
+================================================================================
+
+2.1 HARDWARE REQUIREMENTS
+--------------------------
+
+1.  Processor
+    o   Minimum:     Dual-core 2.0 GHz
+    o   Recommended: Quad-core 2.5 GHz or higher
+
+2.  RAM
+    o   Minimum:     4 GB
+    o   Recommended: 8 GB or higher
+
+3.  Storage
+    o   Minimum:     10 GB HDD
+    o   Recommended: 50 GB SSD (for faster access)
+
+4.  Internet
+    o   Minimum:     Stable broadband
+    o   Recommended: High-speed (> 10 Mbps)
+
+
+2.2 SOFTWARE REQUIREMENTS
+--------------------------
+
+Frontend
+    - HTML5 (Latest standard)
+    - CSS3 (Custom - no framework)
+    - Vanilla JavaScript (ES6+)
+    - Web Browser (Chrome, Firefox, Edge)
+
+Backend / Database
+    - Supabase (PostgreSQL cloud database)
+    - Supabase REST API (auto-generated)
+    - No dedicated backend server required
+
+Deployment
+    - GitHub (version control)
+    - Vercel (static site hosting - free tier)
+
+Development Tools
+    - Visual Studio Code / Kiro IDE
+    - Node.js (for local server testing)
+    - Git & GitHub Desktop
+
+
+2.3 SOFTWARE DEPENDENCIES
+--------------------------
+
+2.3.1 Introduction to HTML5, CSS3 & JavaScript
+------------------------------------------------
+
+The frontend is built entirely with HTML5, CSS3, and Vanilla
+JavaScript. This approach eliminates the need for any external
+frameworks like React or Angular, making the application lightweight
+and fast to load on any device.
+
+Key Features of the Frontend Stack:
+1.  Pure HTML/CSS/JS - No build tools or compilation required.
+2.  Single Page Application (SPA) pattern using DOM show/hide.
+3.  Responsive design using CSS Grid, Flexbox, and media queries.
+4.  All UI components (modals, cards, tables, badges) are custom-built.
+5.  Works offline for reading - only writes need internet (Supabase).
+6.  Deploy anywhere - served as static files from Vercel CDN.
+
+
+2.3.2 Introduction to Supabase
+--------------------------------
+
+Supabase is an open-source Firebase alternative that provides a
+PostgreSQL database with auto-generated REST APIs. It is used as the
+backend database for this project, replacing localStorage with a
+real cloud database.
+
+Key Features of Supabase:
+1.  PostgreSQL Database - Real relational database with SQL.
+2.  Auto-generated REST API - No backend code needed.
+3.  Free Tier - 500MB storage, unlimited API calls.
+4.  Real-time capable - Changes reflect instantly.
+5.  Cross-platform - Data accessible from any browser/device.
+6.  Secure - Row Level Security (RLS) and API key authentication.
+
+
+2.3.3 Introduction to Vercel
+------------------------------
+
+Vercel is a cloud platform for deploying static web applications.
+The College Fees Management System is deployed on Vercel, making it
+accessible globally without any server management.
+
+Key Features of Vercel:
+1.  Free Tier - No cost for personal projects.
+2.  Auto-deploy - Pushes to GitHub trigger automatic redeployment.
+3.  CDN - Content delivered from edge servers worldwide.
+4.  Custom domains - Supports custom domain names.
+5.  HTTPS - All deployments are secured with SSL.
+6.  Zero config - Detects static sites and deploys automatically.
+
+
+2.4 EXISTING SYSTEM
+---------------------
+
+1.  Paper-Based Records - Manually maintaining fee ledgers and
+    student records requires significant time and effort.
+2.  No Real-Time Access - Teachers cannot check fee status or
+    attendance from different devices simultaneously.
+3.  No Student Self-Service - Students have to physically inquire
+    about their fee balance, attendance, or results.
+4.  Data Loss Risk - Paper records can be lost or damaged;
+    no backup mechanism.
+5.  No Cross-Device Sync - Spreadsheet files stored locally
+    are not accessible from mobile phones or other computers.
+
+
+2.5 PROPOSED SYSTEM
+---------------------
+
+1.  Manage all student records digitally with course mapping.
+2.  Define fee structures per course and year; auto-fill payments.
+3.  Mark attendance in bulk for entire classes with one click.
+4.  Publish exam results (CIE + SEE marks) with auto-grading.
+5.  Manage weekly timetable per course and year.
+6.  Students can login with Roll No + DOB to view their portal.
+7.  All data stored in Supabase cloud - accessible from any device.
+8.  Deployed on Vercel - works on mobile, tablet, desktop globally.
+
+
+2.6 DEVELOPMENT TOOLS & TECHNOLOGIES
+--------------------------------------
+
+1.  HTML5 / CSS3 / JavaScript - Frontend UI for Admin & Student.
+2.  Supabase (PostgreSQL) - Cloud database with REST API.
+3.  Vercel - Free global deployment with auto GitHub sync.
+4.  GitHub - Version control and source code repository.
+5.  Node.js / Express - Used for local testing server.
+6.  Kiro IDE / VS Code - Development environment.
+
+
+2.7 FEATURES OF THE PROPOSED SYSTEM
+--------------------------------------
+
+1.  Role-based Login (Admin/Staff and Student).
+2.  Student Management - Add, edit, delete with fee preview.
+3.  Fee Structure - Define tuition, exam, library, lab, other fees.
+4.  Payments - Record payments, track balance, print receipts.
+5.  Subjects - Manage course subjects with codes and credits.
+6.  Timetable - Weekly schedule per course and year.
+7.  Attendance - Bulk mark, toggle, view with bar chart.
+8.  Exam Results - Enter CIE + SEE marks, auto-grade, publish.
+9.  Reports - Collection summary, course-wise, defaulters, CSV export.
+10. Student Portal - 6-tab portal with all academic details.
+
+
+2.8 ADVANTAGES OF THE PROPOSED SYSTEM
+----------------------------------------
+
+1.  Cloud-Based - Data persists and syncs across all devices.
+2.  Globally Accessible - Works from any phone or computer worldwide.
+3.  No Installation - Runs in any modern web browser.
+4.  Free Hosting - Vercel + Supabase free tiers cost nothing.
+5.  Secure - Role-based access prevents unauthorized data access.
+6.  Real-Time - Admin changes are immediately visible to students.
+7.  Mobile Responsive - Works perfectly on smartphones and tablets.
+8.  Receipt Generation - Auto-generates printable fee receipts.
+
+
+2.9 DISADVANTAGES OF THE PROPOSED SYSTEM
+-------------------------------------------
+
+1.  Requires Internet - Supabase API calls need active internet.
+2.  Free Tier Limits - Supabase free tier has 500MB storage limit.
+3.  Basic Authentication - Uses sessionStorage, not JWT tokens.
+4.  No Email Notifications - Fee reminders not yet automated.
+
+
+================================================================================
+                         CHAPTER 3
+                  DESIGN AND DEVELOPMENT
+================================================================================
+
+3.1 DATA FLOW DIAGRAM (DFD)
+-----------------------------
+
+A Data Flow Diagram (DFD) represents the flow of data in the system.
+
+3.1.1 Level 0 (Context Diagram)
+---------------------------------
+
+The Level 0 DFD represents an overview of the system, showing
+interaction between Admin Staff, Students, and the Supabase database.
+
+Entities involved in the system include:
+- The Admin (Staff), who manages all records.
+- The Student, who views personal academic data.
+- The Supabase Database, which stores all system data.
+- The Vercel Server, which hosts and serves the application.
+
+3.1.2 Level 1 (Detailed DFD)
+-------------------------------
+
+At this level, the detailed data flow is described as follows:
+
+Admin Flow:
+  - Admin logs in with username + password.
+  - Admin manages Students, Fee Structures, Payments.
+  - Admin marks Attendance, manages Timetable, Subjects.
+  - Admin publishes Exam Results.
+  - All changes are saved to Supabase via REST API calls.
+
+Student Flow:
+  - Student logs in with Roll Number + Date of Birth.
+  - System queries Supabase for student record (ilike match).
+  - Student portal fetches courses, payments, fee structures,
+    subjects, timetable, attendance, exam results from Supabase.
+  - Student views 6-tab portal with all their academic data.
+  - Student can print fee receipts directly from browser.
+
+3.1.3 DATA FLOW DIAGRAM
+-------------------------
+
+[ADMIN/STAFF]
+     |
+     | (username + password)
+     v
+[LOGIN PAGE] -----> [ADMIN PANEL - 9 Pages]
+                         |
+                         |--- Students (CRUD)
+                         |--- Fee Structure (CRUD)
+                         |--- Payments (CRUD + Receipt)
+                         |--- Subjects (CRUD)
+                         |--- Timetable (CRUD)
+                         |--- Attendance (Bulk Mark)
+                         |--- Exam Results (CRUD)
+                         |--- Reports (CSV Export)
+                         |--- Dashboard (Charts/Stats)
+                         |
+                         v
+                  [SUPABASE REST API]
+                         |
+                         v
+                [PostgreSQL Database]
+                    (Cloud - Free)
+                         ^
+                         |
+                  [SUPABASE REST API]
+                         |
+[STUDENT LOGIN] <--------+
+(Roll No + DOB)          |
+     |                   |
+     v                   |
+[STUDENT PORTAL]  -------+
+  6 Tabs:
+  - Home (stats, details, alerts)
+  - Courses (subjects + codes)
+  - Attendance (bar chart + log)
+  - Timetable (weekly schedule)
+  - Exam Results (CIE/SEE/grade)
+  - Fee (breakdown + receipts)
+
+
+3.2 MODULE DESCRIPTION
+------------------------
+
+The system comprises the following key modules:
+
+1.  Login & Authentication:
+    Admin uses username + password. Student uses Roll Number
+    + Date of Birth. Role is stored in sessionStorage.
+
+2.  Student Management:
+    Add/edit/delete students. Course mapping shows fee preview.
+    DOB is the student's portal password.
+
+3.  Fee Structure Management:
+    Define per-course, per-year fee breakdown (Tuition, Exam,
+    Library, Lab, Other). Total auto-calculated.
+
+4.  Payments Module:
+    Record payments with auto-fill from fee structure. Generate
+    collision-safe receipt numbers. Print branded receipts.
+
+5.  Subjects Module:
+    Manage subject codes, names, credits mapped to course + year.
+
+6.  Timetable Module:
+    Weekly schedule cards grouped by day for each course/year.
+
+7.  Attendance Module:
+    Bulk mark entire class at once. Toggle individual records.
+    Student portal shows bar chart with colour coding (75% threshold).
+
+8.  Exam Results Module:
+    Enter CIE (internal) + SEE (semester end) marks.
+    System auto-calculates grade (O/A+/A/B+/B/C/D/F) and result.
+
+9.  Reports Module:
+    Fee collection summary, course-wise breakdown, defaulters list,
+    CSV export for students and payments.
+
+10. Student Portal:
+    6-tab portal fetching data directly from Supabase with
+    filtered queries per student's course/year.
+
+3.2.1 Input Design
+-------------------
+
+- Admin Login: Username + Password verified against hardcoded
+  credentials stored in JavaScript.
+- Student Login: Roll Number + DOB queried against Supabase
+  students table using ilike (case-insensitive match).
+- Student Form: Name, Roll No, Email, Phone, DOB, Gender,
+  Course, Year, Status, Admission Date, Address.
+- Payment Form: Student (select), Fee Amount (auto-filled),
+  Amount Paid, Date, Method, Receipt No, Remarks.
+- Attendance: Course + Year + Subject + Date; mark each student
+  Present/Absent with "All Present / All Absent" buttons.
+- Exam Result: Student, Semester, Subject Code, Subject Name,
+  Max Marks, CIE Marks, SEE Marks; auto-grades on save.
+
+3.2.2 Output Design
+--------------------
+
+- Admin Dashboard: 6 stat cards, collection progress bar, donut
+  chart (paid/partial/pending), monthly bar chart, recent payments
+  table, students-by-course list.
+- Student Portal: Personalized 6-tab dashboard showing all
+  academic and financial details for the logged-in student.
+- Fee Receipt: Branded printable receipt with college logo,
+  student info, itemised fee breakdown, signature lines.
+- Reports: Course-wise collection table, defaulters list,
+  downloadable CSV files for students and payments.
+
+
+================================================================================
+                         CHAPTER 4
+                       IMPLEMENTATION
+================================================================================
+
+4.1 OVERVIEW OF IMPLEMENTATION
+---------------------------------
+
+The College Fees Management System is designed to manage all
+aspects of student academic and financial records for Shanmuga
+Industries Arts and Science College. This system integrates:
+
+- Frontend: HTML5, CSS3, Vanilla JavaScript (SPA pattern)
+- Database: Supabase PostgreSQL (cloud, free tier)
+- Hosting: Vercel (auto-deploy from GitHub)
+- Authentication: sessionStorage-based role switching
+
+SYSTEM ARCHITECTURE
+--------------------
+
+1.  Frontend (HTML/CSS/JS)
+    o   Single Page Application with 9 admin pages.
+    o   Student portal with 6 tabs.
+    o   All data rendered from in-memory JS cache.
+    o   Responsive design works on mobile and desktop.
+
+2.  Data Layer (db.js)
+    o   Supabase REST API calls replace localStorage.
+    o   In-memory cache populated on app start via DB.load().
+    o   All CRUD operations update both Supabase and cache.
+    o   Snake_case DB columns mapped to camelCase in JS.
+
+3.  Supabase (PostgreSQL)
+    o   8 tables: courses, fee_structures, students, payments,
+        course_subjects, timetable, attendance, exam_results.
+    o   Row-level security disabled (anon key access).
+    o   REST API auto-generated for all tables.
+
+4.  Deployment (Vercel)
+    o   GitHub push triggers auto-redeploy on Vercel.
+    o   Live URL accessible from any phone worldwide.
+    o   SSL/HTTPS secured automatically.
+
+
+4.2 STEP-BY-STEP IMPLEMENTATION
+---------------------------------
+
+4.2.1 Setup the Project
+
+To set up the project, install Node.js and clone the repository:
+
+  git clone https://github.com/manigandan21112006-design/
+             college-fees-management-system.git
+  cd college-fees-management
+
+Run local server:
+  node server.js
+  -- OR --
+  npx serve . -l 3000
+
+Create Supabase Database:
+  Execute the file supabase-schema.sql in the Supabase SQL Editor
+  at: https://supabase.com/dashboard → SQL Editor → New Query
+  → Paste content → Run
+
+
+4.2.2 Frontend (index.html) - Admin Panel
+
+The admin panel is a Single Page Application with a fixed sidebar
+and 9 content sections. Navigation uses a JavaScript navigate()
+function that shows/hides sections without page reload.
+
+Pages:
+  - Dashboard   (charts, stats, recent payments)
+  - Students    (search, filter, CRUD with fee preview)
+  - Fee Structure (course cards with year-wise breakdown)
+  - Payments    (search, filter by status, receipt printing)
+  - Subjects    (course filter buttons, code + credits)
+  - Timetable   (day-grouped card layout, course/year filter)
+  - Attendance  (bulk mark modal, toggle records)
+  - Exam Results (CIE/SEE marks, auto-grade)
+  - Reports     (collection summary, CSV export)
+
+
+4.2.3 Student Portal (student-portal.html)
+
+The student portal is a separate page with 6 tab sections:
+  - Home:         3 stat boxes, personal details grid, smart alerts.
+  - Courses:      Registered subjects with code, name, credits.
+  - Attendance:   Colour-coded bar chart + attendance log table.
+  - Timetable:    Weekly schedule filtered by student's course/year.
+  - Exam Results: CIE / SEE / Total / Grade / Pass-Fail table.
+  - Fee:          Itemised fee breakdown + payment history + receipts.
+
+Data is fetched from Supabase in parallel using Promise.all(),
+filtered by the student's course_id and year for efficiency.
+
+
+4.2.4 Database (supabase-schema.sql)
+
+The database uses Supabase PostgreSQL with 8 tables:
+  - courses:        Course name, department, duration.
+  - fee_structures: Tuition, exam, library, lab, other, total.
+  - students:       All student fields including roll_no and dob.
+  - payments:       Amount, paid_amount, method, receipt_no, status.
+  - course_subjects: Subject code, name, credits per course+year.
+  - timetable:      Day, period, subject, room, faculty.
+  - attendance:     Per student, per subject, per date with status.
+  - exam_results:   CIE, SEE, total, grade, result per subject.
+
+
+4.2.5 Authentication
+
+Admin Login:
+  Credentials hardcoded in login.html:
+  - Username: manigandan / Password: siasc@123
+  - Username: admin      / Password: admin123
+  On success, sessionStorage stores role:'admin', redirects to index.html.
+
+Student Login:
+  Roll Number + Date of Birth queried against Supabase:
+  GET /students?roll_no=ilike.{roll}&dob=eq.{YYYY-MM-DD}
+  Case-insensitive match using PostgreSQL ilike operator.
+  On success, sessionStorage stores role:'student', studentId,
+  redirects to student-portal.html.
+
+
+4.2.6 Running the Project
+
+Start locally:
+  node server.js
+  Open: http://localhost:3000
+
+Access live (from any device):
+  https://college-fees-management-system-mani-0f54.vercel.app
+
+Admin credentials:
+  Username: manigandan
+  Password: siasc@123
+
+Student credentials (examples):
+  Roll No: CS2301  | DOB: 2005-03-12 (12/Mar/2005)
+  Roll No: EC2301  | DOB: 2005-11-05 (05/Nov/2005)
+  Roll No: 1nc22cd046 | DOB: 2004-09-28 (28/Sep/2004)
+
+
+4.3 OVERVIEW OF API (SUPABASE)
+--------------------------------
+
+The College Fees Management System uses Supabase REST API for all
+database operations. The API system handles authentication, student
+data retrieval, fee management, attendance, and exam results.
+
+Supabase Project:
+  URL: https://sbbmcosqxjngmqnpgucw.supabase.co
+  Anon Key: sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B
+
+4.3.1 Supabase REST API (Data Layer)
+
+All API calls use the Supabase REST API via JavaScript fetch().
+The db.js file manages all interactions:
+
+  async function sbFetch(path, options = {}) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+      }
+    });
+    return res.json();
+  }
+
+Key API Endpoints and Their Functionality:
+
+1.  GET /students
+    Retrieves all student records for admin panel.
+
+2.  GET /students?roll_no=ilike.{roll}&dob=eq.{date}
+    Student login - case-insensitive roll number match.
+
+3.  POST /students
+    Adds a new student record to the database.
+
+4.  PATCH /students?id=eq.{id}
+    Updates an existing student record.
+
+5.  DELETE /students?id=eq.{id}
+    Deletes a student record (cascades to payments/attendance).
+
+6.  GET /payments?student_id=eq.{id}
+    Retrieves all payment records for a specific student.
+
+7.  POST /attendance (with Prefer: resolution=merge-duplicates)
+    Bulk upsert attendance records (insert or update on conflict).
+
+8.  GET /exam_results?student_id=eq.{id}&order=semester,id
+    Retrieves exam results for a student, ordered by semester.
+
+9.  GET /course_subjects?course_id=eq.{id}&order=year,id
+    Retrieves subjects for a student's specific course.
+
+10. GET /timetable?course_id=eq.{id}&year=eq.{year}
+    Retrieves timetable slots filtered by course and year.
+
+
+4.3.2 In-Memory Cache Architecture
+
+To keep the UI synchronous (no async calls in render functions),
+data is loaded once into a cache object:
+
+  const _cache = {
+    courses, feeStructures, students, payments,
+    courseSubjects, timetable, attendance, examResults
+  };
+
+  DB.load() fetches all 8 tables in parallel:
+  await Promise.all([
+    sbFetch('courses?order=id'),
+    sbFetch('fee_structures?order=id'),
+    sbFetch('students?order=id'),
+    sbFetch('payments?order=id'),
+    ...
+  ]);
+
+After load(), all DB.X.all() and DB.X.get() calls are
+synchronous reads from _cache. Writes (add/update/delete)
+hit Supabase then update the cache in place.
+
+
+4.3.3 Database Schema (8 Tables)
+
+courses:
+  id, name, duration, department
+
+fee_structures:
+  id, course_id (FK), year, tuition_fee, exam_fee,
+  library_fee, lab_fee, other_fee, total
+
+students:
+  id, roll_no (UNIQUE), name, email, phone, dob,
+  gender, address, course_id (FK), year, status,
+  admission_date
+
+payments:
+  id, student_id (FK CASCADE), fee_structure_id (FK),
+  amount, paid_amount, payment_date, method,
+  receipt_no, status, remark
+
+course_subjects:
+  id, course_id (FK CASCADE), year, code, name, credits
+
+timetable:
+  id, course_id (FK CASCADE), year, day, period,
+  subject_code, subject_name, room, faculty
+
+attendance:
+  id, student_id (FK CASCADE), subject_code, subject_name,
+  date, status
+  UNIQUE(student_id, subject_code, date)
+
+exam_results:
+  id, student_id (FK CASCADE), semester, subject_code,
+  subject_name, max_marks, cie_marks, see_marks,
+  total_marks, grade, result
+
+
+4.3.4 Security Measures
+
+- Supabase anon key is public (publishable) - safe to expose.
+- Row Level Security (RLS) disabled for simplicity.
+- Admin credentials stored as plain text (suitable for demo).
+- Student login uses DOB as password (Roll No + DOB match).
+- sessionStorage expires when browser tab is closed.
+- Admin panel redirects students away via role check.
+- Student portal redirects admins away via role check.
+
+
+4.4 SOURCE CODE
+----------------
+
+(Key extracts - full code available at GitHub repository)
+https://github.com/manigandan21112006-design/college-fees-management-system
+
+--------------------------------------------------------------------
+supabase-config.js (Shared Configuration)
+--------------------------------------------------------------------
+const SUPABASE_URL = 'https://sbbmcosqxjngmqnpgucw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_wrlAWHOhkF793JWhZIEYSA_GYcRTR5B';
+
+--------------------------------------------------------------------
+db.js (Data Layer - Key Extract)
+--------------------------------------------------------------------
+async function sbFetch(path, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+      ...(options.headers || {}),
+    },
+  });
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+const DB = {
+  load: async () => {
+    const [courses, fees, students, payments,
+           subjects, timetable, attendance, results]
+    = await Promise.all([
+      sbFetch('courses?order=id'),
+      sbFetch('fee_structures?order=id'),
+      sbFetch('students?order=id'),
+      sbFetch('payments?order=id'),
+      sbFetch('course_subjects?order=id'),
+      sbFetch('timetable?order=id'),
+      sbFetch('attendance?order=id'),
+      sbFetch('exam_results?order=id'),
+    ]);
+    _cache.courses        = (courses  || []).map(mapCourse);
+    _cache.feeStructures  = (fees     || []).map(mapFeeStructure);
+    _cache.students       = (students || []).map(mapStudent);
+    _cache.payments       = (payments || []).map(mapPayment);
+    // ...
+  },
+  Students: makeCollection('students', 'students',
+                            mapStudent, toDbStudent, { ... }),
+  Payments: makeCollection('payments', 'payments',
+                            mapPayment, toDbPayment, {
+    byStudent: (studentId) =>
+      _cache.payments.filter(p => p.studentId === studentId),
+  }),
+  // ... (8 collections total)
+};
+
+--------------------------------------------------------------------
+login.html (Student Login - Key Extract)
+--------------------------------------------------------------------
+async function handleStudentLogin(e) {
+  const roll = document.getElementById('student-roll').value.trim();
+  const dob  = `${year}-${month}-${day}`;
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/students?roll_no=ilike.${roll}
+     &dob=eq.${dob}`,
+    { headers: { 'apikey': SUPABASE_KEY, ... } }
+  );
+  const students = await res.json();
+
+  if (students && students.length > 0) {
+    sessionStorage.setItem('cfms_auth', JSON.stringify({
+      username: students[0].roll_no,
+      display:  students[0].name,
+      role:     'student',
+      studentId: students[0].id,
+    }));
+    window.location.replace('student-portal.html');
+  }
+}
+
+--------------------------------------------------------------------
+students.js (Fee Preview on Course Change - Key Extract)
+--------------------------------------------------------------------
+function onStudentCourseYearChange() {
+  const courseId = parseInt(
+    document.getElementById('student-course').value);
+  const year = parseInt(
+    document.getElementById('student-year').value);
+  const fs = DB.FeeStructures.byCourseYear(courseId, year);
+
+  if (fs) {
+    preview.innerHTML = `
+      <div style="background:#f0fdf4;...">
+        <div>Tuition: Rs.${fs.tuitionFee.toLocaleString()}</div>
+        <div>Exam:    Rs.${fs.examFee.toLocaleString()}</div>
+        <div>Total:   Rs.${fs.total.toLocaleString()}</div>
+        <div>Student can login with Roll No + Date of Birth</div>
+      </div>`;
+  }
+}
+
+--------------------------------------------------------------------
+attendance-admin.js (Bulk Mark - Key Extract)
+--------------------------------------------------------------------
+async function saveAttendance() {
+  const records = students.map(s => {
+    const radio = document.querySelector(
+      `input[name="att_${s.id}"]:checked`);
+    return {
+      studentId: s.id, subjectCode, subjectName,
+      date, status: radio ? radio.value : 'Present'
+    };
+  });
+  await DB.Attendance.bulkMark(records);
+  toast(`Attendance saved for ${records.length} students.`,
+        'success');
+}
+
+--------------------------------------------------------------------
+exams-admin.js (Auto-Grade - Key Extract)
+--------------------------------------------------------------------
+function autoGrade(cie, see, max) {
+  const pct = ((cie + see) / max) * 100;
+  if (pct >= 90) return { grade: 'O',  result: 'Pass' };
+  if (pct >= 80) return { grade: 'A+', result: 'Pass' };
+  if (pct >= 70) return { grade: 'A',  result: 'Pass' };
+  if (pct >= 60) return { grade: 'B+', result: 'Pass' };
+  if (pct >= 55) return { grade: 'B',  result: 'Pass' };
+  if (pct >= 50) return { grade: 'C',  result: 'Pass' };
+  if (pct >= 40) return { grade: 'D',  result: 'Pass' };
+  return { grade: 'F', result: 'Fail' };
+}
+
+--------------------------------------------------------------------
+student-portal.html (Parallel Data Fetch - Key Extract)
+--------------------------------------------------------------------
+async function initPortal() {
+  const rawStudents = await spFetch(
+    `students?roll_no=ilike.${auth.username}`);
+  const studentRow = rawStudents[0];
+  const studentId  = studentRow.id;
+
+  const [rawCourses, rawPayments, rawFees,
+         rawSubjects, rawTimetable,
+         rawAttendance, rawResults] = await Promise.all([
+    spFetch('courses?order=id'),
+    spFetch(`payments?student_id=eq.${studentId}&order=id`),
+    spFetch(`fee_structures?course_id=eq.${courseId}`),
+    spFetch(`course_subjects?course_id=eq.${courseId}`),
+    spFetch(`timetable?course_id=eq.${courseId}
+             &year=eq.${year}`),
+    spFetch(`attendance?student_id=eq.${studentId}`),
+    spFetch(`exam_results?student_id=eq.${studentId}`),
+  ]);
+  // Build spData and render all tabs
+}
+
+
+4.5 OUTPUT SCREENSHOTS
+-----------------------
+
+4.5.1  LOGIN PAGE
+       - Role toggle: Admin/Staff | Student
+       - Admin form: Username + Password
+       - Student form: Roll Number + Day/Month/Year DOB dropdowns
+
+4.5.2  ADMIN DASHBOARD
+       - 6 stat cards (Total Students, Active, Fees Collected,
+         Fees Pending, Fully Paid, Pending Payments)
+       - Collection progress bar
+       - Donut chart (Paid/Partial/Pending distribution)
+       - Monthly bar chart
+       - Recent payments table
+       - Students by course list
+
+4.5.3  STUDENTS PAGE
+       - Search bar (name, roll no, email)
+       - Roll No as separate badge column
+       - Fee status with balance/no-fee-structure warning
+       - View popup: fee breakdown, subjects, payment history
+
+4.5.4  FEE STRUCTURE PAGE
+       - Course cards with year-wise fee breakdown table
+       - Tuition, Exam, Library, Lab, Other, Total columns
+
+4.5.5  PAYMENTS PAGE
+       - Search bar + All/Paid/Partial/Pending filter buttons
+       - Roll No as separate column
+       - Auto-fill fee amount from fee structure
+       - Itemised fee info card when student selected
+       - Print receipt button per row
+
+4.5.6  SUBJECTS PAGE
+       - Course filter buttons (All + per course)
+       - Subject Code column as teal badge
+       - Search by code, name, course
+
+4.5.7  TIMETABLE PAGE
+       - Day-grouped slot cards (Monday to Saturday)
+       - Filter by course and year
+       - Shows period, subject, faculty, room
+
+4.5.8  ATTENDANCE PAGE
+       - Mark Attendance modal: select course/year/subject/date
+       - All Present / All Absent quick buttons
+       - Roll No + name shown for each student
+       - Toggle Present/Absent on individual records
+
+4.5.9  EXAM RESULTS PAGE
+       - Search bar + Student/Semester dropdowns
+       - Roll No as separate column
+       - Grade badges (O=green, F=red, others=blue/amber)
+       - Auto-computed grade and result on save
+
+4.5.10 STUDENT PORTAL - HOME TAB
+       - Stat boxes: Subjects, Avg Attendance %, Fee Paid
+       - My Details grid (10 fields)
+       - Quick Overview alerts (low attendance, fails, fee due)
+
+4.5.11 STUDENT PORTAL - COURSES TAB
+       - All registered subjects with code and credits
+       - Total credits displayed at bottom
+
+4.5.12 STUDENT PORTAL - ATTENDANCE TAB
+       - 3 stat boxes: Total Classes, Overall %, Below 75%
+       - Colour-coded bar chart per subject
+         (Green >= 75%, Amber >= 60%, Red < 60%)
+       - Full attendance log table sorted by date
+
+4.5.13 STUDENT PORTAL - TIMETABLE TAB
+       - Weekly schedule grouped by day
+       - Each slot shows period, subject code, faculty, room
+
+4.5.14 STUDENT PORTAL - EXAM RESULTS TAB
+       - Summary: Total subjects, Passed, Failed
+       - Full result sheet: Semester, Code, Subject,
+         CIE, SEE, Total, Grade, Result
+
+4.5.15 STUDENT PORTAL - FEE TAB
+       - 3 stat boxes: Total Fee, Paid, Balance
+       - Payment progress bar with percentage
+       - Itemised fee structure breakdown card
+       - Payment history table with print receipt button
+       - Branded receipt with college name, student info,
+         fee breakdown, signature lines, generation timestamp
+
+
+================================================================================
+                         CHAPTER 5
+                  FUTURE SCOPE & CONCLUSION
+================================================================================
+
+5.1 FUTURE SCOPE
+-----------------
+
+Future Enhancements:
+
+1.  Supabase Auth Integration
+    o   Replace hardcoded admin credentials with Supabase Auth.
+    o   Email-based OTP login for students.
+    o   Password reset via email.
+
+2.  Push Notifications
+    o   SMS/WhatsApp alerts for fee due reminders.
+    o   Email notifications when exam results are published.
+    o   Attendance shortage warning automatically sent to students.
+
+3.  Mobile App
+    o   React Native / Flutter app for offline access.
+    o   Push notifications for fee and attendance alerts.
+    o   Camera scan for physical attendance (QR code).
+
+4.  Advanced Analytics
+    o   Semester-wise performance tracking.
+    o   Year-on-year fee collection comparison charts.
+    o   AI-based fee defaulter prediction.
+
+5.  LMS Integration
+    o   Export attendance and results to Google Classroom.
+    o   Sync with university ERP systems.
+
+6.  Multi-College Support
+    o   Tenant-based architecture for multiple colleges.
+    o   Each college gets its own database and domain.
+
+
+5.2 CONCLUSION
+---------------
+
+The College Fees Management System is a comprehensive web-based
+application that streamlines the entire academic and financial
+management process for Shanmuga Industries Arts and Science College.
+
+By integrating HTML5/CSS3/JavaScript (Frontend), Supabase PostgreSQL
+(Backend Database), and Vercel (Global Hosting), the system provides:
+
+Key Benefits:
+- Cloud-based data storage accessible from any device worldwide.
+- Role-based access for Admin/Staff and Students.
+- Complete fee management: structure definition, payment recording,
+  receipt printing, and balance tracking.
+- Academic management: subjects, timetable, attendance, exam results.
+- Student self-service portal: 6-tab dashboard with all personal
+  academic and financial information.
+- Fully free to deploy and host (Supabase + Vercel free tiers).
+- Mobile responsive - works on phones, tablets, and desktops.
+
+With future enhancements like Supabase Auth, push notifications,
+and mobile app integration, this system has the potential to become
+a complete college management solution used by multiple institutions.
+
+The project successfully demonstrates how modern web technologies
+and free cloud services can be combined to build a production-ready
+college management system without any monthly hosting costs.
+
+
+================================================================================
+                           REFERENCES
+================================================================================
+
+BOOK REFERENCES
+----------------
+
+JavaScript: The Good Parts
+- By Douglas Crockford
+- O'Reilly Media
+- Covers JavaScript best practices for building web applications
+
+Web Development with Node and Express
+- By Ethan Brown
+- O'Reilly Media
+- Backend web development patterns applicable to Express server
+
+
+WEB REFERENCES
+---------------
+
+1.  Supabase Documentation:
+    https://supabase.com/docs
+
+2.  Supabase REST API Reference:
+    https://supabase.com/docs/guides/api
+
+3.  MDN Web Docs (HTML/CSS/JS):
+    https://developer.mozilla.org/
+
+4.  Vercel Documentation:
+    https://vercel.com/docs
+
+5.  PostgreSQL Documentation:
+    https://www.postgresql.org/docs/
+
+6.  GitHub Repository (Source Code):
+    https://github.com/manigandan21112006-design/
+    college-fees-management-system
+
+7.  Live Deployment:
+    https://college-fees-management-system-mani-0f54.vercel.app
+
+8.  Supabase Dashboard (Project):
+    https://supabase.com/dashboard/project/sbbmcosqxjngmqnpgucw
+
+
+================================================================================
+                       END OF DOCUMENT
+       College Fees Management System - Project Documentation
+            Shanmuga Industries Arts and Science College
+                     Tiruvannamalai - 606603
+                         March 2026
+================================================================================

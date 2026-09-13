@@ -33,7 +33,8 @@ function renderStudents() {
     const course   = courses.find(c => c.id === s.courseId);
     const payments = DB.Payments.byStudent(s.id);
     const paid     = payments.reduce((sum, p) => sum + p.paidAmount, 0);
-    const due      = payments.reduce((sum, p) => sum + p.amount, 0);
+    const feeStr   = DB.FeeStructures.byCourseYear(s.courseId, s.year);
+    const due      = feeStr ? feeStr.total : payments.reduce((sum, p) => sum + p.amount, 0);
     const balance  = due - paid;
 
     // Dynamically resolve fee structure for this student
@@ -226,7 +227,9 @@ function openViewStudent(id) {
   const payments = DB.Payments.byStudent(id);
   const fs       = DB.FeeStructures.byCourseYear(s.courseId, s.year);
   const paid     = payments.reduce((sum, p) => sum + p.paidAmount, 0);
-  const due      = payments.reduce((sum, p) => sum + p.amount, 0);
+  // Due = fee structure total — NOT payment records (would be 0 with no payments)
+  const due      = fs ? fs.total : payments.reduce((sum, p) => sum + p.amount, 0);
+  const balance  = due - paid;
   const subjects = DB.CourseSubjects.byCourseYear(s.courseId, s.year);
 
   document.getElementById('view-student-info').innerHTML = `
@@ -268,7 +271,7 @@ function openViewStudent(id) {
       <div style="font-size:.82rem">
         Paid: <strong style="color:#16a34a">${fmtCurrency(paid)}</strong> /
         Due: <strong>${fmtCurrency(due)}</strong>
-        ${due-paid > 0 ? `· <strong style="color:#dc2626">Balance: ${fmtCurrency(due-paid)}</strong>` : ' · <span style="color:#16a34a">✅ Fully Paid</span>'}
+        ${balance > 0 ? `· <strong style="color:#dc2626">Balance: ${fmtCurrency(balance)}</strong>` : ' · <span style="color:#16a34a">✅ Fully Paid</span>'}
       </div>
     </div>
     <div class="table-wrap">

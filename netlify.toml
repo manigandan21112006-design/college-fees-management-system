@@ -1,0 +1,11 @@
+# Netlify configuration for College Fees Management System
+# This is a static site — no build step needed
+
+[build]
+  publish = "."
+  command = ""
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

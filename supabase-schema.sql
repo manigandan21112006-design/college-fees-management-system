@@ -114,6 +114,28 @@ alter table timetable        disable row level security;
 alter table attendance       disable row level security;
 alter table exam_results     disable row level security;
 
+-- ── GRANT API ACCESS (required after Oct 30, 2025) ───────────
+-- These grants ensure the anon key can read/write all tables
+-- even after Supabase stops auto-granting access to new tables.
+
+grant select, insert, update, delete on public.courses          to anon;
+grant select, insert, update, delete on public.fee_structures   to anon;
+grant select, insert, update, delete on public.students         to anon;
+grant select, insert, update, delete on public.payments         to anon;
+grant select, insert, update, delete on public.course_subjects  to anon;
+grant select, insert, update, delete on public.timetable        to anon;
+grant select, insert, update, delete on public.attendance       to anon;
+grant select, insert, update, delete on public.exam_results     to anon;
+
+grant select, insert, update, delete on public.courses          to authenticated;
+grant select, insert, update, delete on public.fee_structures   to authenticated;
+grant select, insert, update, delete on public.students         to authenticated;
+grant select, insert, update, delete on public.payments         to authenticated;
+grant select, insert, update, delete on public.course_subjects  to authenticated;
+grant select, insert, update, delete on public.timetable        to authenticated;
+grant select, insert, update, delete on public.attendance       to authenticated;
+grant select, insert, update, delete on public.exam_results     to authenticated;
+
 -- ── SEED DATA ────────────────────────────────────────────────
 
 -- Courses
